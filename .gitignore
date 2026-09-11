@@ -1,12 +1,32 @@
-# OS Metadata
-.DS_Store
-Thumbs.db
-desktop.ini
+﻿# Dependencies
+node_modules
+/.pnp
+.pnp.js
 
-# Environment and Logs
-*.log
+# Next.js Build
+/.next/
+/out/
+/build
+tsconfig.tsbuildinfo
+
+# Production
+.DS_Store
+*.pem
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Env Files
 .env
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Vercel
 .vercel
+
+# Legacy Archive (optional: keep in git or ignore)

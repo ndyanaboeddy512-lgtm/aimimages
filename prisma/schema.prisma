@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Project {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  category      String    // Weddings, Fashion, Commercial, Events, Portraits, Travel, Music Videos, Brand Films
+  description   String    @db.Text
+  client        String?
+  year          Int
+  location      String
+  coverImage    String
+  videoUrl      String?
+  duration      String?
+  isVideo       Boolean   @default(false)
+  featured      Boolean   @default(false)
+  gallery       String[]
+  deliverables  String[]
+  gearUsed      String[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Service {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  tagline       String
+  description   String    @db.Text
+  icon          String
+  startingPrice String
+  deliverables  String[]
+  timeline      String
+  order         Int       @default(0)
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  bio         String   @db.Text
+  image       String
+  socialUrl   String?
+  order       Int      @default(0)
+}
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  clientName  String
+  roleOrEvent String
+  comment     String   @db.Text
+  rating      Int      @default(5)
+  avatar      String?
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Enquiry {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  service     String
+  eventDate   String?
+  budgetRange String?
+  message     String   @db.Text
+  status      String   @default("PENDING") // PENDING, REVIEWED, BOOKED, ARCHIVED
+  createdAt   DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  subscribedAt DateTime @default(now())
+}
