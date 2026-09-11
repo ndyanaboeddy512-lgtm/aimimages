@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -28,13 +28,13 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-6 py-28">
-      <div className="w-full max-w-md p-8 sm:p-10 rounded-2xl bg-obsidian-850 border border-white/10 shadow-2xl space-y-8">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 sm:px-6 py-20 sm:py-28">
+      <div className="w-full max-w-md p-6 sm:p-10 rounded-2xl bg-obsidian-850 border border-white/10 shadow-2xl space-y-6 sm:space-y-8">
         <div className="text-center space-y-3">
           <div className="w-12 h-12 rounded-full border border-gold-500/40 bg-gold-500/10 flex items-center justify-center mx-auto text-gold-400">
             <Lock className="w-6 h-6" />
           </div>
-          <h1 className="font-serif text-2xl font-bold text-cream-50">
+          <h1 className="font-serif text-xl sm:text-2xl font-bold text-cream-50">
             Studio Management Portal
           </h1>
           <p className="text-xs text-slate-400">
@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
               placeholder="Enter master key"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"
+              className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors min-h-[44px]"
             />
             <p className="text-[11px] text-slate-500 mt-2">
               Default studio password: <code className="text-gold-400">aimimages2024</code>
@@ -70,7 +70,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-wider transition-colors shadow-lg"
+            className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 py-3.5 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-wider transition-colors shadow-lg"
           >
             <span>{loading ? 'Authenticating...' : 'Enter Studio Console'}</span>
             <ArrowRight className="w-4 h-4" />

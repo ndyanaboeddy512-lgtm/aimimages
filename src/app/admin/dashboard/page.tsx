@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -89,15 +89,15 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="pt-28 pb-24 max-w-7xl mx-auto px-6 space-y-8">
+    <div className="pt-24 sm:pt-28 pb-20 sm:pb-24 max-w-7xl mx-auto px-4 sm:px-6 space-y-6 sm:space-y-8">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-obsidian-850 border border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-6 rounded-2xl bg-obsidian-850 border border-white/10">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gold-500/20 text-gold-400 border border-gold-500/30">
               Studio Console
             </span>
-            <h1 className="font-serif text-2xl font-bold text-cream-50">
+            <h1 className="font-serif text-xl sm:text-2xl font-bold text-cream-50">
               Aim Images Executive Dashboard
             </h1>
           </div>
@@ -106,16 +106,17 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>PostgreSQL Prisma Engine Ready</span>
+            <span className="truncate">PostgreSQL Ready</span>
           </div>
 
           <button
             onClick={handleLogout}
-            className="p-2.5 rounded-xl border border-white/10 text-slate-400 hover:text-white hover:border-red-500/40 hover:bg-red-500/10 transition-colors"
+            className="min-w-[44px] min-h-[44px] rounded-xl border border-white/10 text-slate-400 hover:text-white hover:border-red-500/40 hover:bg-red-500/10 transition-colors flex items-center justify-center"
             title="Sign Out"
+            aria-label="Sign Out"
           >
             <LogOut className="w-4 h-4" />
           </button>
@@ -123,51 +124,51 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-2">
-          <span className="text-xs uppercase tracking-wider text-slate-400">Total Enquiries</span>
-          <span className="font-serif text-3xl font-bold text-gold-400 block">{enquiries.length}</span>
-          <span className="text-[11px] text-emerald-400">1 New this week</span>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div className="p-4 sm:p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-1 sm:space-y-2">
+          <span className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-400">Total Enquiries</span>
+          <span className="font-serif text-2xl sm:text-3xl font-bold text-gold-400 block">{enquiries.length}</span>
+          <span className="text-[10px] sm:text-[11px] text-emerald-400">1 New this week</span>
         </div>
-        <div className="p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-2">
-          <span className="text-xs uppercase tracking-wider text-slate-400">Portfolio Projects</span>
-          <span className="font-serif text-3xl font-bold text-cream-50 block">{INITIAL_PROJECTS.length}</span>
-          <span className="text-[11px] text-slate-400">8 Disciplines Active</span>
+        <div className="p-4 sm:p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-1 sm:space-y-2">
+          <span className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-400">Portfolio Projects</span>
+          <span className="font-serif text-2xl sm:text-3xl font-bold text-cream-50 block">{INITIAL_PROJECTS.length}</span>
+          <span className="text-[10px] sm:text-[11px] text-slate-400">8 Disciplines Active</span>
         </div>
-        <div className="p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-2">
-          <span className="text-xs uppercase tracking-wider text-slate-400">Approved Reviews</span>
-          <span className="font-serif text-3xl font-bold text-cream-50 block">{TESTIMONIALS.length}</span>
-          <span className="text-[11px] text-gold-400">5.0 Star Average</span>
+        <div className="p-4 sm:p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-1 sm:space-y-2">
+          <span className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-400">Approved Reviews</span>
+          <span className="font-serif text-2xl sm:text-3xl font-bold text-cream-50 block">{TESTIMONIALS.length}</span>
+          <span className="text-[10px] sm:text-[11px] text-gold-400">5.0 Star Average</span>
         </div>
-        <div className="p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-2">
-          <span className="text-xs uppercase tracking-wider text-slate-400">Active Services</span>
-          <span className="font-serif text-3xl font-bold text-cream-50 block">{SERVICES.length}</span>
-          <span className="text-[11px] text-slate-400">Cinema & Stills</span>
+        <div className="p-4 sm:p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-1 sm:space-y-2">
+          <span className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-400">Active Services</span>
+          <span className="font-serif text-2xl sm:text-3xl font-bold text-cream-50 block">{SERVICES.length}</span>
+          <span className="text-[10px] sm:text-[11px] text-slate-400">Cinema & Stills</span>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-white/10 pb-4 overflow-x-auto scrollbar-none">
+      {/* Navigation Tabs - swipeable on mobile */}
+      <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex items-center gap-2 border-b border-white/10 pb-3 overflow-x-auto scrollbar-none touch-pan-x">
         <button
           onClick={() => setActiveTab('enquiries')}
-          className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors ${
-            activeTab === 'enquiries' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400 hover:text-white'
+          className={`min-h-[44px] px-4 sm:px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap shrink-0 ${
+            activeTab === 'enquiries' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400 hover:text-white bg-obsidian-900 border border-white/5'
           }`}
         >
           Bookings & Enquiries ({enquiries.length})
         </button>
         <button
           onClick={() => setActiveTab('projects')}
-          className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors ${
-            activeTab === 'projects' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400 hover:text-white'
+          className={`min-h-[44px] px-4 sm:px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap shrink-0 ${
+            activeTab === 'projects' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400 hover:text-white bg-obsidian-900 border border-white/5'
           }`}
         >
           Portfolio Works ({INITIAL_PROJECTS.length})
         </button>
         <button
           onClick={() => setActiveTab('settings')}
-          className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors ${
-            activeTab === 'settings' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400 hover:text-white'
+          className={`min-h-[44px] px-4 sm:px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap shrink-0 ${
+            activeTab === 'settings' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400 hover:text-white bg-obsidian-900 border border-white/5'
           }`}
         >
           Security & Password
@@ -180,34 +181,34 @@ export default function AdminDashboardPage() {
           {enquiries.map((enq) => (
             <div
               key={enq.id}
-              className="p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-4"
+              className="p-4 sm:p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-4"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-4">
                 <div>
-                  <h3 className="font-serif text-lg font-bold text-cream-50">{enq.name}</h3>
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 mt-1">
+                  <h3 className="font-serif text-base sm:text-lg font-bold text-cream-50">{enq.name}</h3>
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-slate-400 mt-1">
                     <span className="flex items-center gap-1">
-                      <Mail className="w-3.5 h-3.5 text-gold-500" />
-                      {enq.email}
+                      <Mail className="w-3.5 h-3.5 text-gold-500 shrink-0" />
+                      <span className="break-all">{enq.email}</span>
                     </span>
                     {enq.phone && (
                       <span className="flex items-center gap-1">
-                        <Phone className="w-3.5 h-3.5 text-gold-500" />
-                        {enq.phone}
+                        <Phone className="w-3.5 h-3.5 text-gold-500 shrink-0" />
+                        <span>{enq.phone}</span>
                       </span>
                     )}
                     <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-slate-500" />
-                      {enq.createdAt}
+                      <Clock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      <span>{enq.createdAt}</span>
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 pt-2 sm:pt-0">
                   <select
                     value={enq.status}
                     onChange={(e) => handleStatusChange(enq.id, e.target.value)}
-                    className="bg-obsidian-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-cream-100 focus:outline-none focus:border-gold-500"
+                    className="min-h-[40px] bg-obsidian-900 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-cream-100 focus:outline-none focus:border-gold-500"
                   >
                     <option value="PENDING">Status: PENDING</option>
                     <option value="REVIEWED">Status: REVIEWED</option>
@@ -217,7 +218,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs bg-obsidian-900 p-4 rounded-xl border border-white/5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs bg-obsidian-900 p-3 sm:p-4 rounded-xl border border-white/5">
                 <div>
                   <span className="text-slate-500 uppercase tracking-wider text-[10px] block">Discipline</span>
                   <span className="text-gold-400 font-medium">{enq.service}</span>
@@ -232,7 +233,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <p className="text-xs text-slate-300 leading-relaxed bg-obsidian-900/50 p-4 rounded-xl">
+              <p className="text-xs text-slate-300 leading-relaxed bg-obsidian-900/50 p-3 sm:p-4 rounded-xl break-words">
                 "{enq.message}"
               </p>
             </div>
@@ -244,12 +245,12 @@ export default function AdminDashboardPage() {
       {activeTab === 'projects' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif text-xl font-bold text-cream-50">
+            <h3 className="font-serif text-lg sm:text-xl font-bold text-cream-50">
               Live Showcase Works ({INITIAL_PROJECTS.length})
             </h3>
             <Link
               href="/portfolio"
-              className="text-xs text-gold-400 hover:text-gold-300 font-semibold uppercase tracking-wider"
+              className="text-xs text-gold-400 hover:text-gold-300 font-semibold uppercase tracking-wider min-h-[44px] inline-flex items-center"
             >
               Preview Live Portfolio →
             </Link>
@@ -259,7 +260,7 @@ export default function AdminDashboardPage() {
             {INITIAL_PROJECTS.map((proj) => (
               <div
                 key={proj.id}
-                className="p-5 rounded-2xl bg-obsidian-850 border border-white/10 flex items-center justify-between gap-4"
+                className="p-4 sm:p-5 rounded-2xl bg-obsidian-850 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4"
               >
                 <div className="space-y-1 truncate">
                   <span className="text-[10px] uppercase font-bold tracking-wider text-gold-400">
@@ -270,7 +271,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <Link
                   href={`/portfolio/${proj.slug}`}
-                  className="px-4 py-2 rounded-lg bg-obsidian-900 border border-white/10 text-xs text-gold-400 hover:border-gold-500/40 shrink-0 font-medium"
+                  className="min-h-[40px] px-4 py-2 rounded-lg bg-obsidian-900 border border-white/10 text-xs text-gold-400 hover:border-gold-500/40 shrink-0 font-medium flex items-center justify-center text-center"
                 >
                   Inspect
                 </Link>
@@ -282,7 +283,7 @@ export default function AdminDashboardPage() {
 
       {/* Tab 3: Security & Password */}
       {activeTab === 'settings' && (
-        <div className="max-w-md p-8 rounded-2xl bg-obsidian-850 border border-white/10 space-y-6">
+        <div className="max-w-md p-6 sm:p-8 rounded-2xl bg-obsidian-850 border border-white/10 space-y-6">
           <div className="space-y-2">
             <h3 className="font-serif text-xl font-bold text-cream-50 flex items-center gap-2">
               <KeyRound className="w-5 h-5 text-gold-500" />
@@ -312,13 +313,13 @@ export default function AdminDashboardPage() {
                 placeholder="Minimum 6 characters"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 focus:outline-none focus:border-gold-500 transition-colors"
+                className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 focus:outline-none focus:border-gold-500 transition-colors min-h-[44px]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-full bg-gold-500 text-obsidian-950 font-bold text-xs uppercase tracking-wider hover:bg-gold-400 transition-colors shadow-lg"
+              className="w-full min-h-[48px] py-3 rounded-full bg-gold-500 text-obsidian-950 font-bold text-xs uppercase tracking-wider hover:bg-gold-400 transition-colors shadow-lg flex items-center justify-center"
             >
               Save New Master Password
             </button>

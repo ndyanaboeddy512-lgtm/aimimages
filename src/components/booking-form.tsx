@@ -64,24 +64,24 @@ export function BookingForm() {
 
   if (status === 'success') {
     return (
-      <div className="p-8 sm:p-12 rounded-2xl bg-obsidian-850 border border-gold-500/40 text-center space-y-6">
-        <div className="w-16 h-16 rounded-full bg-gold-500/10 border border-gold-500 flex items-center justify-center mx-auto text-gold-400">
-          <CheckCircle2 className="w-8 h-8" />
+      <div className="p-6 sm:p-10 rounded-2xl bg-obsidian-850 border border-gold-500/40 text-center space-y-6">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gold-500/10 border border-gold-500 flex items-center justify-center mx-auto text-gold-400">
+          <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8" />
         </div>
         <div className="space-y-2">
-          <h3 className="font-serif text-2xl font-bold text-cream-50">
-            Inquiry Received
+          <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream-50">
+            Inquiry Transmitted
           </h3>
-          <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-            Thank you, {formData.name || 'valued client'}. Eddy and the creative directors have received your project briefing and will respond within 24 hours with our studio availability and tailored proposal.
+          <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+            Thank you, {formData.name || 'valued client'}. Eddy and the creative directors have received your project briefing and will respond within 24 hours with availability and a tailored proposal.
           </p>
         </div>
-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
             href={createWhatsAppLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold uppercase tracking-wider transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold uppercase tracking-wider transition-colors"
           >
             <MessageSquare className="w-4 h-4" />
             <span>Connect on WhatsApp Now</span>
@@ -99,7 +99,7 @@ export function BookingForm() {
                 message: ''
               });
             }}
-            className="w-full sm:w-auto px-6 py-3 rounded-full border border-white/10 text-xs font-semibold uppercase tracking-wider text-slate-300 hover:text-white hover:border-white/30"
+            className="w-full sm:w-auto min-h-[48px] px-6 py-3 rounded-full border border-white/10 text-xs font-semibold uppercase tracking-wider text-slate-300 hover:text-white hover:border-white/30"
           >
             Submit Another Project
           </button>
@@ -109,7 +109,10 @@ export function BookingForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-8 sm:p-10 rounded-2xl bg-obsidian-850 border border-white/10 space-y-6 shadow-2xl">
+    <form
+      onSubmit={handleSubmit}
+      className="p-5 sm:p-8 md:p-10 rounded-2xl bg-obsidian-850 border border-white/10 space-y-5 sm:space-y-6 shadow-2xl"
+    >
       {errorMessage && (
         <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
           <AlertCircle className="w-4 h-4 shrink-0" />
@@ -117,7 +120,7 @@ export function BookingForm() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div>
           <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2 font-medium">
             Full Name *
@@ -128,7 +131,7 @@ export function BookingForm() {
             placeholder="Elena Rostova"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"
+            className="w-full min-h-[48px] bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"
           />
         </div>
 
@@ -142,12 +145,12 @@ export function BookingForm() {
             placeholder="elena@company.com"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"
+            className="w-full min-h-[48px] bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div>
           <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2 font-medium">
             Phone / WhatsApp
@@ -157,7 +160,7 @@ export function BookingForm() {
             placeholder="+1 (555) 000-0000"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"
+            className="w-full min-h-[48px] bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"
           />
         </div>
 
@@ -169,12 +172,12 @@ export function BookingForm() {
             type="date"
             value={formData.eventDate}
             onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-            className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 focus:outline-none focus:border-gold-500 transition-colors"
+            className="w-full min-h-[48px] bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-cream-50 focus:outline-none focus:border-gold-500 transition-colors"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div>
           <label className="block text-xs uppercase tracking-wider text-slate-400 mb-2 font-medium">
             Production Discipline *
@@ -182,7 +185,7 @@ export function BookingForm() {
           <select
             value={formData.service}
             onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-            className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 focus:outline-none focus:border-gold-500 transition-colors"
+            className="w-full min-h-[48px] bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-cream-50 focus:outline-none focus:border-gold-500 transition-colors"
           >
             {servicesList.map((svc) => (
               <option key={svc} value={svc}>
@@ -199,7 +202,7 @@ export function BookingForm() {
           <select
             value={formData.budgetRange}
             onChange={(e) => setFormData({ ...formData, budgetRange: e.target.value })}
-            className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-sm text-cream-50 focus:outline-none focus:border-gold-500 transition-colors"
+            className="w-full min-h-[48px] bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-cream-50 focus:outline-none focus:border-gold-500 transition-colors"
           >
             {budgetRanges.map((b) => (
               <option key={b} value={b}>
@@ -220,15 +223,15 @@ export function BookingForm() {
           placeholder="Describe your vision, locations, expected deliverables, and aesthetic preferences..."
           value={formData.message}
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          className="w-full bg-obsidian-900 border border-white/10 rounded-xl p-4 text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"
+          className="w-full bg-obsidian-900 border border-white/10 rounded-xl p-4 text-base sm:text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"
         />
       </div>
 
-      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs tracking-widest uppercase transition-all duration-300 shadow-[0_0_25px_rgba(212,175,55,0.3)]"
+          className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-3 px-8 py-3.5 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs tracking-widest uppercase transition-all duration-300 shadow-[0_0_25px_rgba(212,175,55,0.3)]"
         >
           <span>{status === 'loading' ? 'Transmitting...' : 'Transmit Project Brief'}</span>
           <Send className="w-4 h-4" />
@@ -238,7 +241,7 @@ export function BookingForm() {
           href={createWhatsAppLink()}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-xs text-emerald-400 hover:text-emerald-300 uppercase tracking-wider font-semibold transition-colors"
+          className="min-h-[44px] inline-flex items-center justify-center gap-2 text-xs text-emerald-400 hover:text-emerald-300 uppercase tracking-wider font-semibold transition-colors py-2"
         >
           <MessageSquare className="w-4 h-4" />
           <span>Or Chat Live on WhatsApp</span>

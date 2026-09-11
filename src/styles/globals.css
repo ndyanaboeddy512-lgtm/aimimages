@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -23,13 +23,37 @@
 
   * {
     border-color: rgb(37 42 52);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    max-width: 100vw;
+    overflow-x: clip;
+    scroll-behavior: smooth;
   }
 
   body {
     background-color: #08090A;
     color: #F5F4EF;
     font-feature-settings: "rlig" 1, "calt" 1;
-    overflow-x: hidden;
+    max-width: 100vw;
+    overflow-x: clip;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Prevent automatic iOS Safari zooming on form inputs by ensuring 16px font size on mobile */
+  @media screen and (max-width: 767px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Smooth momentum touch scrolling for horizontally scrollable strips */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
 
   /* Custom luxury scrollbar */

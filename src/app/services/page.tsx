@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { SERVICES, FAQS } from '@/lib/data';
 import { FAQAccordion } from '@/components/faq-accordion';
@@ -29,29 +29,29 @@ export default function ServicesPage() {
   ];
 
   return (
-    <div className="pt-32 pb-24 space-y-24">
+    <div className="pt-28 sm:pt-32 pb-20 sm:pb-24 space-y-16 sm:space-y-24">
       {/* Hero Header */}
-      <div className="max-w-7xl mx-auto px-6 text-center space-y-4">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-400 text-xs font-semibold uppercase tracking-[0.25em]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center space-y-4">
+        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-400 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] sm:tracking-[0.25em]">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Disciplines & Investment</span>
         </div>
-        <h1 className="font-serif text-4xl sm:text-6xl font-bold text-cream-50">
+        <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold text-cream-50 break-words leading-tight">
           Tailored Creative Packages
         </h1>
-        <p className="max-w-2xl mx-auto text-sm sm:text-base text-slate-400 leading-relaxed">
+        <p className="max-w-2xl mx-auto text-xs sm:text-base text-slate-400 leading-relaxed">
           Transparent investment tiers for world-class visual storytelling. Every commission receives our senior creative team’s dedicated focus.
         </p>
       </div>
 
       {/* Services Grid */}
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
         {SERVICES.map((service) => (
           <div
             key={service.id}
-            className="p-8 rounded-2xl bg-obsidian-850 border border-white/10 hover:border-gold-500/40 transition-all duration-300 flex flex-col justify-between space-y-8"
+            className="p-6 sm:p-8 rounded-2xl bg-obsidian-850 border border-white/10 hover:border-gold-500/40 transition-all duration-300 flex flex-col justify-between space-y-6 sm:space-y-8"
           >
-            <div className="space-y-6">
+            <div className="space-y-5 sm:space-y-6">
               <div className="flex items-center justify-between">
                 <span className="text-xs uppercase tracking-widest text-gold-400 font-semibold">
                   Package 0{service.order}
@@ -63,7 +63,7 @@ export default function ServicesPage() {
               </div>
 
               <div>
-                <h3 className="font-serif text-2xl font-bold text-cream-50 mb-2">
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-cream-50 mb-2">
                   {service.title}
                 </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
@@ -75,7 +75,7 @@ export default function ServicesPage() {
                 <span className="text-[11px] uppercase tracking-wider text-slate-500 block">
                   Starting Investment
                 </span>
-                <span className="font-serif text-3xl font-bold text-gold-400 block mt-1">
+                <span className="font-serif text-2xl sm:text-3xl font-bold text-gold-400 block mt-1">
                   {service.startingPrice}
                 </span>
               </div>
@@ -98,7 +98,7 @@ export default function ServicesPage() {
             <div className="pt-6 border-t border-white/5">
               <Link
                 href={`/contact?package=${encodeURIComponent(service.title)}`}
-                className="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-md"
+                className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 py-3.5 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-md"
               >
                 <span>Book This Package</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -109,27 +109,27 @@ export default function ServicesPage() {
       </div>
 
       {/* 4-Step Production Timeline */}
-      <div className="bg-obsidian-900 border-y border-white/5 py-24">
-        <div className="max-w-7xl mx-auto px-6 space-y-16">
+      <div className="bg-obsidian-900 border-y border-white/5 py-16 sm:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12 sm:space-y-16">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="text-xs uppercase tracking-[0.25em] text-gold-400 font-semibold">
               The Journey
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-cream-50">
+            <h2 className="font-serif text-2xl sm:text-4xl font-bold text-cream-50">
               Our 4-Step Production Workflow
             </h2>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
               From concept development to the final master delivery, we ensure seamless communication and peace of mind.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {steps.map((step, idx) => (
               <div
                 key={idx}
-                className="p-8 rounded-2xl bg-obsidian-850 border border-white/5 relative space-y-4"
+                className="p-6 sm:p-8 rounded-2xl bg-obsidian-850 border border-white/5 relative space-y-3 sm:space-y-4"
               >
-                <span className="font-serif text-4xl font-bold text-gold-500/20 block">
+                <span className="font-serif text-3xl sm:text-4xl font-bold text-gold-500/20 block">
                   {step.num}
                 </span>
                 <h3 className="font-serif text-lg font-bold text-cream-50">
@@ -145,15 +145,15 @@ export default function ServicesPage() {
       </div>
 
       {/* FAQ Section */}
-      <div className="max-w-4xl mx-auto px-6 space-y-12">
-        <div className="text-center space-y-3">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-8 sm:space-y-12">
+        <div className="text-center space-y-2 sm:space-y-3">
           <span className="text-xs uppercase tracking-[0.25em] text-gold-400 font-semibold">
             Inquiries & Logistics
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-cream-50">
+          <h2 className="font-serif text-2xl sm:text-4xl font-bold text-cream-50">
             Frequently Asked Questions
           </h2>
-          <p className="text-sm text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-400">
             Everything you need to know about working with Aim Images HD Studio.
           </p>
         </div>
@@ -162,18 +162,18 @@ export default function ServicesPage() {
       </div>
 
       {/* Bottom CTA */}
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="p-12 rounded-3xl bg-obsidian-850 border border-gold-500/30 text-center space-y-6">
-          <h3 className="font-serif text-2xl sm:text-3xl font-bold text-cream-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="p-6 sm:p-12 rounded-3xl bg-obsidian-850 border border-gold-500/30 text-center space-y-4 sm:space-y-6">
+          <h3 className="font-serif text-xl sm:text-3xl font-bold text-cream-50 break-words">
             Need a Bespoke or Multi-Day Custom Scope?
           </h3>
-          <p className="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
             We regularly formulate custom commissions for destination weddings, worldwide commercial campaigns, and festival coverage.
           </p>
           <div className="pt-2">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 text-xs uppercase font-bold tracking-widest transition-colors shadow-lg"
+              className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 text-xs uppercase font-bold tracking-widest transition-colors shadow-lg"
             >
               <span>Schedule a Consultation</span>
               <ArrowRight className="w-4 h-4" />
