@@ -27,9 +27,9 @@ export default async function HomePage() {
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-6 sm:space-y-8 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full border border-gold-500/40 bg-obsidian-900/80 backdrop-blur-md text-[10px] sm:text-xs font-semibold uppercase tracking-[0.15em] sm:tracking-[0.25em] text-gold-400 shadow-xl max-w-full">
+          <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full border border-gold-500/40 bg-obsidian-900/80 backdrop-blur-md text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] sm:tracking-[0.25em] text-gold-400 shadow-xl max-w-full">
             <Sparkles className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate sm:whitespace-normal">Worldwide Studio • 2024 / 2025 Bookings Open</span>
+            <span className="truncate sm:whitespace-normal">Worldwide Studio • Bookings Open</span>
           </div>
 
           <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-cream-50 leading-[1.15] sm:leading-[1.1] break-words">
@@ -41,21 +41,33 @@ export default async function HomePage() {
             Aim Images HD crafts breathtaking wedding documentaries, high-fashion editorial campaigns, and cinematic commercial films across the globe.
           </p>
 
-          <div className="pt-2 sm:pt-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-            <Link
-              href="/portfolio"
-              className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_0_30px_rgba(212,175,55,0.35)]"
-            >
-              <span>Explore Portfolio</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+          <div className="pt-2 sm:pt-4 flex flex-col items-center justify-center gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
+              <Link
+                href="/portfolio"
+                className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_0_30px_rgba(212,175,55,0.35)]"
+              >
+                <span>Explore Portfolio</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
 
-            <Link
-              href="/contact"
-              className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-obsidian-900/90 border border-white/20 hover:border-gold-500/60 text-cream-100 font-semibold text-xs uppercase tracking-widest transition-all duration-300 hover:bg-obsidian-850"
-            >
-              <span>Inquire & Book</span>
-            </Link>
+              <Link
+                href="/contact"
+                className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-obsidian-900/90 border border-white/20 hover:border-gold-500/60 text-cream-100 font-semibold text-xs uppercase tracking-widest transition-all duration-300 hover:bg-obsidian-850"
+              >
+                <span>Inquire & Book</span>
+              </Link>
+            </div>
+
+            {/* Premium Availability Status Indicator */}
+            <div className="inline-flex items-center gap-2 pt-1 text-xs text-slate-400">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium tracking-wide">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span>Bookings Open</span>
+              </span>
+              <span className="text-slate-600">•</span>
+              <span className="text-slate-400 text-[11px] sm:text-xs tracking-wider uppercase">Worldwide Commissions</span>
+            </div>
           </div>
         </div>
       </section>
@@ -259,32 +271,39 @@ export default async function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-12">
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-obsidian-900 via-obsidian-850 to-obsidian-900 border border-gold-500/30 p-6 sm:p-12 md:p-16 text-center space-y-6 sm:space-y-8">
           <div className="max-w-2xl mx-auto space-y-3 sm:space-y-4">
-            <span className="text-xs uppercase tracking-[0.25em] text-gold-400 font-semibold">
-              Reserve Your Production
-            </span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span>Bookings Open</span>
+            </div>
             <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-bold text-cream-50 leading-tight break-words">
               Ready to create something unforgettable?
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              Dates for 2024 and 2025 are strictly limited to ensure uncompromising creative attention for each client.
+              Dates are strictly limited to ensure uncompromising creative attention for each client.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-            <Link
-              href="/contact"
-              className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest transition-all shadow-[0_0_25px_rgba(212,175,55,0.3)]"
-            >
-              Submit Studio Brief
-            </Link>
-            <a
-              href="https://wa.me/15552348900?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20a%20production."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center px-8 py-4 rounded-full border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 font-semibold text-xs uppercase tracking-widest transition-all"
-            >
-              Direct WhatsApp Inquiry
-            </a>
+          <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
+              <Link
+                href="/contact"
+                className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest transition-all shadow-[0_0_25px_rgba(212,175,55,0.3)]"
+              >
+                Submit Studio Brief
+              </Link>
+              <a
+                href="https://wa.me/15552348900?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20a%20production."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center px-8 py-4 rounded-full border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 font-semibold text-xs uppercase tracking-widest transition-all"
+              >
+                Direct WhatsApp Inquiry
+              </a>
+            </div>
+
+            <p className="text-[11px] sm:text-xs text-slate-400 tracking-wide pt-1">
+              <span className="text-gold-400 font-medium">Bookings Open</span> — Private dates reserved on a first-confirmed basis
+            </p>
           </div>
         </div>
       </section>
