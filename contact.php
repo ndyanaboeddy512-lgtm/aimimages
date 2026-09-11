@@ -206,28 +206,41 @@ include 'includes/header.php';
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="service_type">Service Needed (Optional)</label>
-                        <select id="service_type" name="service_type" class="form-control">
-                            <option value="">-- Select a Service --</option>
-                            <option value="Wedding Photography" <?php echo ($prefilled_service === 'Wedding Photography') ? 'selected' : ''; ?>>Wedding Photography</option>
-                            <option value="Kukyara / Introduction" <?php echo ($prefilled_service === 'Kukyara & Cultural Introductions' || $prefilled_service === 'Kukyara') ? 'selected' : ''; ?>>Kukyara (Introduction Ceremony)</option>
-                            <option value="Corporate / Event" <?php echo (strpos($prefilled_service, 'Corporate') !== false) ? 'selected' : ''; ?>>Corporate & Event Photography</option>
-                            <option value="Portrait / Studio" <?php echo (strpos($prefilled_service, 'Portrait') !== false) ? 'selected' : ''; ?>>Portrait & Studio Session</option>
-                            <option value="Modeling / Fashion" <?php echo (strpos($prefilled_service, 'Modeling') !== false) ? 'selected' : ''; ?>>Fashion & Modeling Portfolio</option>
-                            <option value="Videography" <?php echo (strpos($prefilled_service, 'Videography') !== false) ? 'selected' : ''; ?>>HD Videography & Drone</option>
-                            <option value="Other">Other Custom Inquiry</option>
-                        </select>
+                    <div style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="service_type">Service Needed</label>
+                            <select id="service_type" name="service_type" class="form-control">
+                                <option value="">-- Select a Service --</option>
+                                <option value="Wedding Photography" <?php echo ($prefilled_service === 'Wedding Photography') ? 'selected' : ''; ?>>Wedding Photography</option>
+                                <option value="Kukyara / Introduction" <?php echo ($prefilled_service === 'Kukyara & Cultural Introductions' || $prefilled_service === 'Kukyara') ? 'selected' : ''; ?>>Kukyara (Introduction Ceremony)</option>
+                                <option value="Corporate / Event" <?php echo (strpos($prefilled_service, 'Corporate') !== false) ? 'selected' : ''; ?>>Corporate & Event Photography</option>
+                                <option value="Portrait / Studio" <?php echo (strpos($prefilled_service, 'Portrait') !== false) ? 'selected' : ''; ?>>Portrait & Studio Session</option>
+                                <option value="Modeling / Fashion" <?php echo (strpos($prefilled_service, 'Modeling') !== false) ? 'selected' : ''; ?>>Fashion & Modeling Portfolio</option>
+                                <option value="Videography" <?php echo (strpos($prefilled_service, 'Videography') !== false) ? 'selected' : ''; ?>>HD Videography & Drone</option>
+                                <option value="Other">Other Custom Inquiry</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="event_date">Preferred Date</label>
+                            <input type="date" id="event_date" name="event_date" class="form-control">
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="message">Your Message / Event Date & Location *</label>
-                        <textarea id="message" name="message" class="form-control" placeholder="Tell us about your event date, venue in Kabale or elsewhere, and what you envision..." required></textarea>
+                        <label for="message">Your Message / Event Venue & Details *</label>
+                        <textarea id="message" name="message" class="form-control" placeholder="Tell us about your event venue in Kabale or elsewhere, package requirements, and ideas..." required></textarea>
                     </div>
 
                     <button type="submit" name="send_contact" class="btn btn-gold" style="width:100%;">
                         Send Inquiry
                     </button>
+
+                    <div style="margin-top: 15px; text-align: center;">
+                        <span style="display:block; color:var(--text-muted); font-size:0.82rem; margin-bottom:8px;">— Or connect with us immediately —</span>
+                        <a href="https://wa.me/256764709563?text=Hello%20Aim%20Images,%20I%20would%20like%20to%20inquire%20about%20booking%20a%20shoot." target="_blank" class="btn btn-outline" style="width:100%; border-color:#25D366; color:#25D366;">
+                            💬 Instant WhatsApp Consultation
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>

@@ -27,9 +27,15 @@ function e($string) {
 }
 
 /**
- * Clean user string input
+ * Resolve local vs remote image URLs seamlessly
  */
-function clean_input($data) {
-    return trim($data ?? '');
+function get_image_url($image_path, $prefix = '') {
+    if (empty($image_path)) {
+        return $prefix . 'images/logo.png';
+    }
+    if (filter_var($image_path, FILTER_VALIDATE_URL)) {
+        return $image_path;
+    }
+    return $prefix . 'images/' . ltrim($image_path, '/');
 }
 ?>

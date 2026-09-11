@@ -91,7 +91,7 @@ include 'includes/header.php';
 
         if ($team_res && mysqli_num_rows($team_res) > 0) {
             while ($member = mysqli_fetch_assoc($team_res)) {
-                $photo = !empty($member['photo']) ? 'images/' . e($member['photo']) : 'images/logo.png';
+                $photo = get_image_url($member['photo']);
                 $name = e($member['name']);
                 $role = !empty($member['role']) ? e($member['role']) : 'Visual Artist';
                 $bio = !empty($member['bio']) ? e($member['bio']) : 'Dedicated to delivering exceptional imagery with artistic passion.';

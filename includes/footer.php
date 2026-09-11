@@ -65,6 +65,21 @@
         </svg>
     </a>
 
+    <!-- Global Fullscreen Lightbox Modal -->
+    <div id="aimLightbox" class="aim-lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="lightbox-overlay" id="lightboxOverlay"></div>
+        <div class="lightbox-container">
+            <button class="lightbox-close" id="lightboxClose" aria-label="Close Lightbox">&times;</button>
+            <div class="lightbox-image-wrap">
+                <img id="lightboxImg" src="" alt="Fullscreen Photography Preview">
+            </div>
+            <div class="lightbox-meta">
+                <span id="lightboxCat" class="lightbox-tag"></span>
+                <h3 id="lightboxTitle" class="lightbox-title"></h3>
+            </div>
+        </div>
+    </div>
+
     <script src="js/main.js"></script>
 </body>
 </html>

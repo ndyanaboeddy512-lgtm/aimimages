@@ -90,14 +90,15 @@ include 'includes/header.php';
         $port_res = $conn ? mysqli_query($conn, $port_query) : false;
         if ($port_res && mysqli_num_rows($port_res) > 0) {
             while ($item = mysqli_fetch_assoc($port_res)) {
-                $img = e($item['image']);
+                $img_src = get_image_url($item['image']);
                 $title = e($item['title']);
                 $category = !empty($item['category']) ? e($item['category']) : 'Photography';
-                echo '<div class="portfolio-card">
-                    <img src="images/' . $img . '" alt="' . $title . '" loading="lazy" onerror="this.src=\'images/logo.png\'">
+                echo '<div class="portfolio-card lightbox-trigger" data-full="' . $img_src . '" data-title="' . $title . '" data-cat="' . $category . '" role="button" tabindex="0" title="Click to view full photo">
+                    <img src="' . $img_src . '" alt="' . $title . '" loading="lazy" onerror="this.src=\'images/logo.png\'">
                     <div class="portfolio-overlay">
                         <span class="portfolio-tag">' . $category . '</span>
                         <h4 class="portfolio-name">' . $title . '</h4>
+                        <span style="color:var(--gold-bright); font-size:0.75rem; margin-top:4px; font-weight:600;">🔍 View Fullscreen</span>
                     </div>
                 </div>';
             }
