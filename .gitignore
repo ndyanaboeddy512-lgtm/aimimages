@@ -30,3 +30,4 @@ yarn-error.log*
 .vercel
 
 # Legacy Archive (optional: keep in git or ignore)
+legacy-php/
