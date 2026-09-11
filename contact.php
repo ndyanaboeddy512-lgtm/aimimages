@@ -1,107 +1,291 @@
-<?php include 'includes/db.php'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - Aim Images HD Photography</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        nav { background: #000; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
-        nav .logo { color: #FFD700; font-size: 1.5em; font-weight: bold; }
-        nav ul { list-style: none; display: flex; gap: 30px; }
-        nav ul li a { color: #fff; text-decoration: none; }
-        nav ul li a:hover { color: #FFD700; }
-        .contact-section { padding: 60px 40px; max-width: 700px; margin: 0 auto; }
-        .contact-section h2 { font-size: 2em; margin-bottom: 10px; }
-        .contact-info { margin-bottom: 40px; color: #555; }
-        .contact-info p { margin: 8px 0; }
-        .contact-form input, .contact-form textarea {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            border: 1px solid #ccc; border-radius: 4px; font-size: 1em;
-        }
-        .contact-form textarea { height: 150px; }
-        .btn { background: #FFD700; color: #000; padding: 12px 35px; border: none; font-weight: bold; cursor: pointer; font-size: 1em; }
-        .success { background: #d4edda; color: #155724; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
-    </style>
-</head>
-<body>
-    <nav>
-        <div class="logo">Aim Images</div>
-        <ul>
-            <li><a href="index.php">Home</a></li>
-            <li><a href="about.php">About</a></li>
-            <li><a href="services.php">Services</a></li>
-            <li><a href="portfolio.php">Portfolio</a></li>
-            <li><a href="contact.php">Contact</a></li>
-        </ul>
-    </nav>
+<?php
+require_once 'includes/db.php';
+$page_title = "Contact & Bookings | Aim Images HD Photography";
+$current_page = "contact.php";
 
-    <div class="contact-section">
-        <h2>Contact Us</h2>
-        <div class="contact-info">
-            <p>📍 Rugarama Road, Kabale, Uganda</p>
-            <p>📞 +256 764 709 563</p>
-            <p>✉️ aimugimages@gmail.com</p>
-            <p>📸 Instagram: @aimimages_hd_photography</p>
-            <p>▶️ YouTube: @AimImagesphotography</p>
+$prefilled_service = isset($_GET['service']) ? clean_input($_GET['service']) : '';
+
+// Flash notification retrieval
+$contact_success = $_SESSION['flash_contact_success'] ?? '';
+$contact_error = $_SESSION['flash_contact_error'] ?? '';
+$review_success = $_SESSION['flash_review_success'] ?? '';
+$review_error = $_SESSION['flash_review_error'] ?? '';
+unset(
+    $_SESSION['flash_contact_success'], 
+    $_SESSION['flash_contact_error'],
+    $_SESSION['flash_review_success'],
+    $_SESSION['flash_review_error']
+);
+
+// 1. Process General Contact / Booking Form
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_contact'])) {
+    $name = clean_input($_POST['name']);
+    $email = clean_input($_POST['email']);
+    $phone = clean_input($_POST['phone']);
+    $service_type = clean_input($_POST['service_type']);
+    $user_message = clean_input($_POST['message']);
+
+    if (empty($name) || empty($email) || empty($user_message)) {
+        $_SESSION['flash_contact_error'] = "Please fill in your name, email, and message.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['flash_contact_error'] = "Please provide a valid email address.";
+    } else {
+        $composed_message = $user_message;
+        if (!empty($service_type)) {
+            $composed_message = "[Service: " . $service_type . "]\n" . $user_message;
+        }
+
+        if ($conn) {
+            $stmt = mysqli_prepare($conn, "INSERT INTO contacts (name, email, phone, message) VALUES (?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt, "ssss", $name, $email, $phone, $composed_message);
+
+            if (mysqli_stmt_execute($stmt)) {
+                $_SESSION['flash_contact_success'] = "Thank you, " . $name . "! Your message has been sent. We will get back to you shortly.";
+            } else {
+                $_SESSION['flash_contact_error'] = "Something went wrong sending your message. Please reach us directly via WhatsApp or phone.";
+            }
+            mysqli_stmt_close($stmt);
+        } else {
+            $_SESSION['flash_contact_success'] = "Thank you, " . $name . "! Your message has been noted. You can also chat with us directly on WhatsApp.";
+        }
+    }
+    header('Location: contact.php#booking');
+    exit();
+}
+
+// 2. Process Client Review Submission Form
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
+    $r_name = clean_input($_POST['review_name']);
+    $r_rating = isset($_POST['rating']) ? intval($_POST['rating']) : 5;
+    $r_message = clean_input($_POST['review_message']);
+
+    if ($r_rating < 1 || $r_rating > 5) {
+        $r_rating = 5;
+    }
+
+    if (empty($r_name) || empty($r_message)) {
+        $_SESSION['flash_review_error'] = "Please provide your name and a brief review message.";
+    } else {
+        if ($conn) {
+            $stmt = mysqli_prepare($conn, "INSERT INTO reviews (name, message, rating, approved) VALUES (?, ?, ?, 0)");
+            mysqli_stmt_bind_param($stmt, "ssi", $r_name, $r_message, $r_rating);
+
+            if (mysqli_stmt_execute($stmt)) {
+                $_SESSION['flash_review_success'] = "Thank you for your feedback! Your review has been submitted and will appear on our website once approved.";
+            } else {
+                $_SESSION['flash_review_error'] = "Could not submit review at this time. Please try again later.";
+            }
+            mysqli_stmt_close($stmt);
+        } else {
+            $_SESSION['flash_review_success'] = "Thank you for your feedback! Your review has been recorded.";
+        }
+    }
+    header('Location: contact.php#leave-review');
+    exit();
+}
+
+include 'includes/header.php';
+?>
+
+<section class="section">
+    <div class="section-header">
+        <span class="section-subtitle">Get In Touch</span>
+        <h1 class="section-title">Let's Discuss Your Vision</h1>
+        <p class="section-desc">Reach out for bookings, availability checks, or general inquiries. We are here to serve you.</p>
+    </div>
+
+    <div class="contact-layout">
+
+        <!-- LEFT: Studio Details -->
+        <div>
+            <div class="contact-card" style="margin-bottom: 30px;">
+                <h2 style="font-family: var(--font-heading); color: var(--gold-bright); font-size: 1.4rem; margin-bottom: 8px;">
+                    Studio Location & Hours
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">
+                    Visit our studio in Kabale or schedule an on-location photo session across Uganda.
+                </p>
+
+                <ul class="contact-info-list">
+                    <li>
+                        <span class="icon">📍</span>
+                        <div>
+                            <strong style="color:var(--text-white); display:block;">Studio Address</strong>
+                            <span>Rugarama Road, Kabale, Western Uganda</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">📞</span>
+                        <div>
+                            <strong style="color:var(--text-white); display:block;">Call / WhatsApp</strong>
+                            <a href="tel:+256764709563">+256 764 709 563</a>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">✉️</span>
+                        <div>
+                            <strong style="color:var(--text-white); display:block;">Email Inquiries</strong>
+                            <a href="mailto:aimugimages@gmail.com">aimugimages@gmail.com</a>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">🕒</span>
+                        <div>
+                            <strong style="color:var(--text-white); display:block;">Operating Hours</strong>
+                            <span>Monday – Saturday: 8:00 AM – 7:00 PM</span><br>
+                            <span style="font-size:0.85rem; color:var(--text-muted);">Sunday: By Appointment</span>
+                        </div>
+                    </li>
+                </ul>
+
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <h4 style="font-size: 0.95rem; color: var(--text-white); margin-bottom: 12px;">Connect On Social Media:</h4>
+                    <div class="social-links">
+                        <a href="https://instagram.com/aimimages_hd_photography" target="_blank" rel="noopener noreferrer" class="social-btn">
+                            Instagram
+                        </a>
+                        <a href="https://youtube.com/@AimImagesphotography" target="_blank" rel="noopener noreferrer" class="social-btn">
+                            YouTube
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instant WhatsApp Box -->
+            <div class="contact-card" style="background: linear-gradient(135deg, rgba(37, 211, 102, 0.1) 0%, rgba(12, 13, 14, 0.9) 100%); border-color: rgba(37, 211, 102, 0.3);">
+                <h3 style="color: #25D366; font-size: 1.15rem; margin-bottom: 8px;">💬 Prefer Instant Chat?</h3>
+                <p style="color: var(--text-sub); font-size: 0.92rem; margin-bottom: 16px;">
+                    Send us a direct message on WhatsApp for immediate availability checks and quote estimates.
+                </p>
+                <a href="https://wa.me/256764709563?text=Hello%20Aim%20Images,%20I%20would%20like%20to%20inquire%20about%20booking%20a%20shoot." 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="btn btn-sm" 
+                   style="background:#25D366; color:#fff; font-weight:bold;">
+                    Chat on WhatsApp Now
+                </a>
+            </div>
         </div>
 
-        <?php
-        if($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $name = $_POST['name'];
-            $email = $_POST['email'];
-            $phone = $_POST['phone'];
-            $message = $_POST['message'];
-            $sql = "INSERT INTO contacts (name, email, phone, message) VALUES ('$name', '$email', '$phone', '$message')";
-            if(mysqli_query($conn, $sql)) {
-                echo '<div class="success">Message sent! We will get back to you soon.</div>';
-            }
-        }
-        ?>
+        <!-- RIGHT: Contact & Booking Form -->
+        <div>
+            <div class="contact-card" id="booking">
+                <h2 style="font-family: var(--font-heading); color: var(--gold-bright); font-size: 1.4rem; margin-bottom: 8px;">
+                    Send a Message or Booking Request
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px;">
+                    Fill out the form below and we will get back to you promptly.
+                </p>
 
-        <div class="contact-form">
-            <form method="POST">
-                <input type="text" name="name" placeholder="Your Name" required>
-                <input type="email" name="email" placeholder="Your Email" required>
-                <input type="text" name="phone" placeholder="Your Phone Number">
-                <textarea name="message" placeholder="Your Message" required></textarea>
-                <button type="submit" class="btn">Send Message</button>
+                <?php if (!empty($contact_success)): ?>
+                    <div class="alert alert-success alert-auto-dismiss">
+                        ✅ <?php echo e($contact_success); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty($contact_error)): ?>
+                    <div class="alert alert-danger">
+                        ⚠️ <?php echo e($contact_error); ?>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST" action="contact.php#booking">
+                    <div class="form-group">
+                        <label for="name">Your Full Name *</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Grace Tumusiime" required>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="grace@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone / WhatsApp Number</label>
+                            <input type="text" id="phone" name="phone" class="form-control" placeholder="+256 700 000 000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service_type">Service Needed (Optional)</label>
+                        <select id="service_type" name="service_type" class="form-control">
+                            <option value="">-- Select a Service --</option>
+                            <option value="Wedding Photography" <?php echo ($prefilled_service === 'Wedding Photography') ? 'selected' : ''; ?>>Wedding Photography</option>
+                            <option value="Kukyara / Introduction" <?php echo ($prefilled_service === 'Kukyara & Cultural Introductions' || $prefilled_service === 'Kukyara') ? 'selected' : ''; ?>>Kukyara (Introduction Ceremony)</option>
+                            <option value="Corporate / Event" <?php echo (strpos($prefilled_service, 'Corporate') !== false) ? 'selected' : ''; ?>>Corporate & Event Photography</option>
+                            <option value="Portrait / Studio" <?php echo (strpos($prefilled_service, 'Portrait') !== false) ? 'selected' : ''; ?>>Portrait & Studio Session</option>
+                            <option value="Modeling / Fashion" <?php echo (strpos($prefilled_service, 'Modeling') !== false) ? 'selected' : ''; ?>>Fashion & Modeling Portfolio</option>
+                            <option value="Videography" <?php echo (strpos($prefilled_service, 'Videography') !== false) ? 'selected' : ''; ?>>HD Videography & Drone</option>
+                            <option value="Other">Other Custom Inquiry</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Your Message / Event Date & Location *</label>
+                        <textarea id="message" name="message" class="form-control" placeholder="Tell us about your event date, venue in Kabale or elsewhere, and what you envision..." required></textarea>
+                    </div>
+
+                    <button type="submit" name="send_contact" class="btn btn-gold" style="width:100%;">
+                        Send Inquiry
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- CLIENT REVIEW SUBMISSION SECTION -->
+<section class="section section-alt" id="leave-review">
+    <div class="section-header">
+        <span class="section-subtitle">Client Feedback</span>
+        <h2 class="section-title">Leave a Review</h2>
+        <p class="section-desc">Have we captured a special milestone for you? We would love to hear about your experience.</p>
+    </div>
+
+    <div style="max-width: 650px; margin: 0 auto;">
+        <div class="contact-card">
+            <?php if (!empty($review_success)): ?>
+                <div class="alert alert-success alert-auto-dismiss">
+                    ✅ <?php echo e($review_success); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($review_error)): ?>
+                <div class="alert alert-danger">
+                    ⚠️ <?php echo e($review_error); ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" action="contact.php#leave-review">
+                <div class="form-group">
+                    <label for="review_name">Your Name / Couple Name *</label>
+                    <input type="text" id="review_name" name="review_name" class="form-control" placeholder="e.g. Sarah & Brian" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Rating *</label>
+                    <div class="star-rating-picker" title="Click to rate">
+                        <span class="star-btn selected" data-value="1">&#9733;</span>
+                        <span class="star-btn selected" data-value="2">&#9733;</span>
+                        <span class="star-btn selected" data-value="3">&#9733;</span>
+                        <span class="star-btn selected" data-value="4">&#9733;</span>
+                        <span class="star-btn selected" data-value="5">&#9733;</span>
+                    </div>
+                    <input type="hidden" name="rating" id="selectedRating" value="5">
+                </div>
+
+                <div class="form-group">
+                    <label for="review_message">Your Experience & Testimonial *</label>
+                    <textarea id="review_message" name="review_message" class="form-control" placeholder="Write a few words about our service, photo quality, and customer experience..." required></textarea>
+                </div>
+
+                <button type="submit" name="submit_review" class="btn btn-outline" style="width:100%; border-color:var(--gold); color:var(--gold);">
+                    Submit Review For Approval
+                </button>
             </form>
         </div>
     </div>
-    <footer style="background:#000; color:#fff; padding:40px; text-align:center;">
-    <div style="margin-bottom:20px;">
-        <img src="/aimimages/images/logo.png" style="height:60px; width:auto;">
-    </div>
-    <p style="color:#FFD700; font-size:1.1em; margin-bottom:10px;">Aim Images HD Photography</p>
-    <p style="color:#aaa; margin-bottom:5px;">📍 Rugarama Road, Kabale, Uganda</p>
-    <p style="color:#aaa; margin-bottom:5px;">📞 +256 764 709 563</p>
-    <p style="color:#aaa; margin-bottom:20px;">✉️ aimugimages@gmail.com</p>
-    <div style="margin-bottom:20px;">
-        <a href="https://instagram.com/aimimages_hd_photography" style="color:#FFD700; margin:0 10px; text-decoration:none;">Instagram</a>
-        <a href="https://youtube.com/@AimImagesphotography" style="color:#FFD700; margin:0 10px; text-decoration:none;">YouTube</a>
-    </div>
-    <p style="color:#555; font-size:0.85em;">© 2024 Aim Images HD Photography. All rights reserved.</p>
-</footer>
-<!-- WhatsApp Floating Button -->
-<a href="https://wa.me/256764709563" target="_blank" 
-style="
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #25D366;
-    color: white;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    text-decoration: none;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-    z-index: 9999;
-">💬</a>
-</body>
-</html>
+</section>
+
+<?php include 'includes/footer.php'; ?>

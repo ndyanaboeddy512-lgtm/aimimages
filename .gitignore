@@ -1,0 +1,12 @@
+# OS Metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment and Logs
+*.log
+.env
+.env.local
+
+# Vercel
+.vercel

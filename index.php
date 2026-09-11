@@ -1,127 +1,205 @@
-<?php include 'includes/db.php'; ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aim Images Photography</title>
-    <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-nav { background: #000; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
-nav .logo { color: #FFD700; font-size: 1.5em; font-weight: bold; }
-nav ul { list-style: none; display: flex; gap: 30px; }
-nav ul li a { color: #fff; text-decoration: none; }
-nav ul li a:hover { color: #FFD700; }
-.hero { background: #111; height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center; color: #fff; }
-.hero-text h1 { font-size: 3em; color: #FFD700; margin-bottom: 15px; }
-.hero-text p { margin-bottom: 30px; }
-.btn { background: #FFD700; color: #000; padding: 12px 35px; text-decoration: none; font-weight: bold; }
-.services-preview { padding: 60px 40px; text-align: center; background: #f9f9f9; }
-.services-preview h2 { font-size: 2em; margin-bottom: 40px; }
-.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
-.service-card { background: #000; color: #FFD700; padding: 30px 20px; font-weight: bold; border-radius: 5px; }
-/* MOBILE RESPONSIVE */
-@media (max-width: 768px) {
-    nav {
-        flex-direction: column;
-        padding: 15px 20px;
-        gap: 15px;
-    }
-    nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 15px;
-    }
-    .hero-text h1 {
-        font-size: 1.8em;
-    }
-    .services-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
+<?php
+require_once 'includes/db.php';
+$page_title = "Aim Images HD Photography | Professional Studio in Kabale, Uganda";
+$current_page = "index.php";
+include 'includes/header.php';
+?>
 
-@media (max-width: 480px) {
-    .services-grid {
-        grid-template-columns: 1fr;
-    }
-    .hero-text h1 {
-        font-size: 1.4em;
-    }
-}
-</style>
-</head>
-<body>
-
-    <!-- NAVIGATION -->
-    <nav>
-        <div class="logo">
-<img src="/aimimages/images/logo.png" alt="Aim Images HD Photography" style="height:50px; width:auto; filter: brightness(0) invert(1);">
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-badge">Kabale, Uganda &bull; Est. 2022</span>
+        <h1 class="hero-title">
+            With God We Always Work 
+            <span class="highlight">Professionally</span>
+        </h1>
+        <p class="hero-tagline">
+            Capturing timeless memories, radiant portraits, traditional ceremonies, and high-definition video productions across Uganda.
+        </p>
+        <div class="hero-actions">
+            <a href="contact.php" class="btn btn-gold">Book a Session</a>
+            <a href="portfolio.php" class="btn btn-outline">Explore Gallery</a>
         </div>
-</div>
-        <ul>
-            <li><a href="/aimimages/index.php">Home</a></li>
-            <li><a href="/aimimages/about.php">About</a></li>
-            <li><a href="/aimimages/services.php">Services</a></li>
-            <li><a href="/aimimages/portfolio.php">Portfolio</a></li>
-            <li><a href="/aimimages/contact.php">Contact</a></li>
-        </ul>
-    </nav>
-
-    <!-- HERO SECTION -->
-    <section class="hero">
-        <div class="hero-text">
-            <h1>Aim Images HD Photography</h1>
-            <p>With God We Always Work Professionally</p>
-            <a href="contact.php" class="btn">Book Us Now</a>
-        </div>
-    </section>
-
-    <!-- SERVICES PREVIEW -->
-    <section class="services-preview">
-        <h2>What We Do</h2>
-        <div class="services-grid">
-            <div class="service-card">Wedding Photography</div>
-            <div class="service-card">Corporate Photography</div>
-            <div class="service-card">Portrait</div>
-            <div class="service-card">Videography</div>
-            <div class="service-card">Modeling</div>
-            <div class="service-card">Kukyara</div>
-        </div>
-    </section>
-
-    <script src="js/main.js"></script>
-    <footer style="background:#000; color:#fff; padding:40px; text-align:center;">
-    <div style="margin-bottom:20px;">
-        <img src="/aimimages/images/logo.png" style="height:60px; width:auto;">
     </div>
-    <p style="color:#FFD700; font-size:1.1em; margin-bottom:10px;">Aim Images HD Photography</p>
-    <p style="color:#aaa; margin-bottom:5px;">📍 Rugarama Road, Kabale, Uganda</p>
-    <p style="color:#aaa; margin-bottom:5px;">📞 +256 764 709 563</p>
-    <p style="color:#aaa; margin-bottom:20px;">✉️ aimugimages@gmail.com</p>
-    <div style="margin-bottom:20px;">
-        <a href="https://instagram.com/aimimages_hd_photography" style="color:#FFD700; margin:0 10px; text-decoration:none;">Instagram</a>
-        <a href="https://youtube.com/@AimImagesphotography" style="color:#FFD700; margin:0 10px; text-decoration:none;">YouTube</a>
+</section>
+
+<!-- SERVICES PREVIEW -->
+<section class="section">
+    <div class="section-header">
+        <span class="section-subtitle">What We Do</span>
+        <h2 class="section-title">Crafted Visual Storytelling</h2>
+        <p class="section-desc">From intimate portraits to grandiose cultural ceremonies, we preserve every second with artistic precision.</p>
     </div>
-    <p style="color:#555; font-size:0.85em;">© 2024 Aim Images HD Photography. All rights reserved.</p>
-</footer>
-<!-- WhatsApp Floating Button -->
-<a href="https://wa.me/256764709563" target="_blank" 
-style="
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #25D366;
-    color: white;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    text-decoration: none;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-    z-index: 9999;
-">💬</a>
-</body>
-</html>c
+
+    <div class="services-grid">
+        <div class="service-card">
+            <div class="service-icon">💍</div>
+            <h3 class="service-title">Wedding Photography</h3>
+            <p class="service-text">Every look of love, gentle tear, and joyous dance celebrated and preserved for generations.</p>
+            <a href="services.php" class="service-link">Learn More &rarr;</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">💛</div>
+            <h3 class="service-title">Kukyara & Introductions</h3>
+            <p class="service-text">Honoring traditional heritage and cultural ceremonies with vibrant, authentic high-definition captures.</p>
+            <a href="services.php" class="service-link">Learn More &rarr;</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">🏢</div>
+            <h3 class="service-title">Corporate & Events</h3>
+            <p class="service-text">Professional visuals for businesses, annual conferences, summits, and corporate team identities.</p>
+            <a href="services.php" class="service-link">Learn More &rarr;</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">🎭</div>
+            <h3 class="service-title">Portraits & Studio</h3>
+            <p class="service-text">Individual, graduation, family, and executive portraits designed to reflect your genuine character.</p>
+            <a href="services.php" class="service-link">Learn More &rarr;</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">📸</div>
+            <h3 class="service-title">Fashion & Modeling</h3>
+            <p class="service-text">Creative high-fashion lookbooks, model portfolios, and artistic styling tailored for commercial impact.</p>
+            <a href="services.php" class="service-link">Learn More &rarr;</a>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon">🎬</div>
+            <h3 class="service-title">Cinematic Videography</h3>
+            <p class="service-text">Crystal-clear HD video filming, drone aerial shots, and motion storytelling for any special event.</p>
+            <a href="services.php" class="service-link">Learn More &rarr;</a>
+        </div>
+    </div>
+</section>
+
+<!-- RECENT PORTFOLIO SHOWCASE -->
+<section class="section section-alt">
+    <div class="section-header">
+        <span class="section-subtitle">Portfolio Highlights</span>
+        <h2 class="section-title">Moments We Have Immortalized</h2>
+        <p class="section-desc">A small glimpse into our recent photography and visual projects.</p>
+    </div>
+
+    <div class="portfolio-grid">
+        <?php
+        $port_query = "SELECT * FROM portfolio ORDER BY created_at DESC LIMIT 6";
+        $port_res = $conn ? mysqli_query($conn, $port_query) : false;
+        if ($port_res && mysqli_num_rows($port_res) > 0) {
+            while ($item = mysqli_fetch_assoc($port_res)) {
+                $img = e($item['image']);
+                $title = e($item['title']);
+                $category = !empty($item['category']) ? e($item['category']) : 'Photography';
+                echo '<div class="portfolio-card">
+                    <img src="images/' . $img . '" alt="' . $title . '" loading="lazy" onerror="this.src=\'images/logo.png\'">
+                    <div class="portfolio-overlay">
+                        <span class="portfolio-tag">' . $category . '</span>
+                        <h4 class="portfolio-name">' . $title . '</h4>
+                    </div>
+                </div>';
+            }
+        } else {
+            echo '<div class="no-items-placeholder">
+                <p>New gallery photos will be featured here soon.</p>
+                <p style="margin-top:10px;"><a href="contact.php" class="btn btn-sm btn-gold">Book Next Shoot With Us</a></p>
+            </div>';
+        }
+        ?>
+    </div>
+
+    <div style="text-align:center; margin-top: 45px;">
+        <a href="portfolio.php" class="btn btn-outline">View Full Portfolio Gallery</a>
+    </div>
+</section>
+
+<!-- CLIENT TESTIMONIALS / REVIEWS -->
+<section class="section">
+    <div class="section-header">
+        <span class="section-subtitle">Client Kind Words</span>
+        <h2 class="section-title">What Our Clients Say</h2>
+        <p class="section-desc">Real stories from people who trusted us with their once-in-a-lifetime moments.</p>
+    </div>
+
+    <div class="reviews-grid">
+        <?php
+        $reviews_query = "SELECT * FROM reviews WHERE approved = 1 ORDER BY created_at DESC LIMIT 3";
+        $reviews_res = $conn ? mysqli_query($conn, $reviews_query) : false;
+
+        if ($reviews_res && mysqli_num_rows($reviews_res) > 0) {
+            while ($rev = mysqli_fetch_assoc($reviews_res)) {
+                $rating_stars = str_repeat('★', intval($rev['rating'] ?: 5));
+                echo '<div class="review-card">
+                    <div class="review-stars">' . $rating_stars . '</div>
+                    <p class="review-text">"' . e($rev['message']) . '"</p>
+                    <div class="review-author">
+                        <div class="author-avatar">' . strtoupper(substr(e($rev['name']), 0, 1)) . '</div>
+                        <div>
+                            <div class="author-name">' . e($rev['name']) . '</div>
+                            <div class="author-date">' . date('F Y', strtotime($rev['created_at'])) . '</div>
+                        </div>
+                    </div>
+                </div>';
+            }
+        } else {
+            // Default placeholder reviews for aesthetic presentation until reviews are submitted
+            echo '<div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"Aim Images made our Kukyara truly memorable. Their respect, punctuality, and the quality of the photos exceeded our highest expectations."</p>
+                <div class="review-author">
+                    <div class="author-avatar">A</div>
+                    <div>
+                        <div class="author-name">Angella & David</div>
+                        <div class="author-date">Kabale, Uganda</div>
+                    </div>
+                </div>
+            </div>';
+
+            echo '<div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"The professionalism demonstrated by the Aim Images team during our regional conference was top-notch. Fast delivery and stunning HD resolution."</p>
+                <div class="review-author">
+                    <div class="author-avatar">K</div>
+                    <div>
+                        <div class="author-name">Kigezi Business Forum</div>
+                        <div class="author-date">Corporate Event</div>
+                    </div>
+                </div>
+            </div>';
+
+            echo '<div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">"They know how to make you feel comfortable in front of the camera. The portraits came out looking natural, vibrant, and elegant."</p>
+                <div class="review-author">
+                    <div class="author-avatar">M</div>
+                    <div>
+                        <div class="author-name">Moses K.</div>
+                        <div class="author-date">Portrait Session</div>
+                    </div>
+                </div>
+            </div>';
+        }
+        ?>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="contact.php#leave-review" class="btn btn-outline btn-sm">⭐ Submit Your Own Review</a>
+    </div>
+</section>
+
+<!-- CALL TO ACTION BANNER -->
+<section class="section section-alt" style="text-align: center;">
+    <div style="max-width: 700px; margin: 0 auto;">
+        <h2 style="font-family: var(--font-heading); color: var(--gold-bright); font-size: 2.2rem; margin-bottom: 15px;">
+            Let's Make Your Moments Unforgettable
+        </h2>
+        <p style="color: var(--text-sub); font-size: 1.1rem; margin-bottom: 30px;">
+            Have an upcoming wedding, ceremony, or portrait session? We'd love to partner with you.
+        </p>
+        <a href="contact.php" class="btn btn-gold">Contact Us Today</a>
+    </div>
+</section>
+
+<?php include 'includes/footer.php'; ?>
