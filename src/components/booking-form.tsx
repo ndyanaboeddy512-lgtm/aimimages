@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { Send, CheckCircle2, MessageSquare, AlertCircle } from 'lucide-react';
@@ -50,22 +50,36 @@ export function BookingForm() {
       }
 
       setStatus('success');
+      try {
+        if (typeof window !== 'undefined') {
+          window.open(createWhatsAppLink(), '_blank');
+        }
+      } catch {
+        // Fallback handled by explicit button
+      }
     } catch {
       setStatus('success');
+      try {
+        if (typeof window !== 'undefined') {
+          window.open(createWhatsAppLink(), '_blank');
+        }
+      } catch {
+        // Fallback handled by explicit button
+      }
     }
   };
 
   const createWhatsAppLink = () => {
     const text = encodeURIComponent(
-      `Hello Aim Images! I would like to inquire about a project:\n\nName: ${formData.name || 'Client'}\nService: ${formData.service}\nDate: ${formData.eventDate || 'TBD'}\nBudget: ${formData.budgetRange}\nNote: ${formData.message || 'Looking forward to discussing details.'}`
+      `Hello Aim Images! I would like to inquire about booking a production:\n\n👤 Name: ${formData.name || 'Client'}\n📸 Service: ${formData.service}\n📅 Date: ${formData.eventDate || 'TBD'}\n💰 Budget: ${formData.budgetRange}\n📝 Note: ${formData.message || 'Looking forward to discussing details.'}`
     );
-    return `https://wa.me/15552348900?text=${text}`;
+    return `https://wa.me/256764709563?text=${text}`;
   };
 
   if (status === 'success') {
     return (
       <div className="p-6 sm:p-10 rounded-2xl bg-obsidian-850 border border-gold-500/40 text-center space-y-6">
-        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gold-500/10 border border-gold-500 flex items-center justify-center mx-auto text-gold-400">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-500/10 border border-emerald-500 flex items-center justify-center mx-auto text-emerald-400">
           <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8" />
         </div>
         <div className="space-y-2">
@@ -73,7 +87,7 @@ export function BookingForm() {
             Inquiry Transmitted
           </h3>
           <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-            Thank you, {formData.name || 'valued client'}. Eddy and the creative directors have received your project briefing and will respond within 24 hours with availability and a tailored proposal.
+            Thank you, {formData.name || 'valued client'}. Your project brief has been recorded and directed to our WhatsApp line for immediate attention.
           </p>
         </div>
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -81,10 +95,10 @@ export function BookingForm() {
             href={createWhatsAppLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold uppercase tracking-wider transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-[48px] px-6 py-3 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold uppercase tracking-wider transition-colors shadow-lg"
           >
             <MessageSquare className="w-4 h-4" />
-            <span>Connect on WhatsApp Now</span>
+            <span>Open WhatsApp Chat Now</span>
           </a>
           <button
             onClick={() => {
@@ -157,7 +171,7 @@ export function BookingForm() {
           </label>
           <input
             type="tel"
-            placeholder="+1 (555) 000-0000"
+            placeholder="+256 700 000 000"
             value={formData.phone}
             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             className="w-full min-h-[48px] bg-obsidian-900 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-cream-50 placeholder-slate-600 focus:outline-none focus:border-gold-500 transition-colors"

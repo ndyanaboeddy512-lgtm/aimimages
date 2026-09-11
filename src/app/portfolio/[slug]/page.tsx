@@ -143,13 +143,17 @@ export default async function ProjectDetailPage({
           </div>
 
           <div className="pt-4 border-t border-white/5">
-            <Link
-              href={`/contact`}
+            <a
+              href={`https://wa.me/256764709563?text=${encodeURIComponent(
+                `Hello Aim Images, I am interested in inquiring about a project similar to ${project.title}.`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 py-3.5 rounded-full bg-gold-500 text-obsidian-950 text-xs font-bold uppercase tracking-wider hover:bg-gold-400 transition-colors shadow-lg"
             >
-              <span>Inquire Similar Project</span>
+              <span>Inquire on WhatsApp</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            </a>
           </div>
         </div>
       </div>

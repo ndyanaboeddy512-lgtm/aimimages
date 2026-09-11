@@ -188,13 +188,15 @@ export default function AboutPage() {
             Our studio is currently accepting commissions for destination weddings, luxury editorial, and commercial campaigns.
           </p>
           <div className="pt-2">
-            <Link
-              href="/contact"
+            <a
+              href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20collaborate%20on%20a%20production."
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest transition-colors shadow-lg"
             >
-              <span>Begin Your Inquiry</span>
+              <span>Begin Your Inquiry on WhatsApp</span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
           </div>
         </div>
       </div>

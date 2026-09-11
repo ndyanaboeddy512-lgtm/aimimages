@@ -96,13 +96,17 @@ export default function ServicesPage() {
             </div>
 
             <div className="pt-6 border-t border-white/5">
-              <Link
-                href={`/contact?package=${encodeURIComponent(service.title)}`}
+              <a
+                href={`https://wa.me/256764709563?text=${encodeURIComponent(
+                  `Hello Aim Images, I would like to book the ${service.title} package.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 py-3.5 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 text-xs font-bold uppercase tracking-wider transition-colors shadow-md"
               >
-                <span>Book This Package</span>
+                <span>Book on WhatsApp</span>
                 <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              </a>
             </div>
           </div>
         ))}
@@ -171,13 +175,15 @@ export default function ServicesPage() {
             We regularly formulate custom commissions for destination weddings, worldwide commercial campaigns, and festival coverage.
           </p>
           <div className="pt-2">
-            <Link
-              href="/contact"
+            <a
+              href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20schedule%20a%20consultation%20for%20a%20bespoke%20production."
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 text-xs uppercase font-bold tracking-widest transition-colors shadow-lg"
             >
-              <span>Schedule a Consultation</span>
+              <span>Schedule on WhatsApp</span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
           </div>
         </div>
       </div>

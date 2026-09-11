@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Camera, Mail, Phone, Instagram, Youtube, CheckCircle2, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { Mail, Phone, Instagram, Youtube, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export function Footer() {
   const [email, setEmail] = useState('');
@@ -35,25 +36,21 @@ export function Footer() {
     <footer className="bg-obsidian-950 border-t border-white/10 text-slate-400 pt-16 sm:pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 sm:gap-12 mb-12 sm:mb-16">
         <div className="sm:col-span-2 space-y-6">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border border-gold-500/30 flex items-center justify-center bg-gold-500/10 shrink-0">
-              <Camera className="w-5 h-5 text-gold-500" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif tracking-[0.2em] text-lg sm:text-xl font-bold text-cream-50">
-                AIM IMAGES
-              </span>
-              <span className="text-[10px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-gold-500/80">
-                Cinema & Photography Studio
-              </span>
-            </div>
+          <Link href="/" className="inline-block" aria-label="Aim Images Home">
+            <Image
+              src="/logo.png"
+              alt="Aim Images Studio Logo"
+              width={180}
+              height={104}
+              className="h-12 sm:h-14 w-auto object-contain"
+            />
           </Link>
           <p className="text-sm leading-relaxed text-slate-400 max-w-sm">
-            High-end cinematography, editorial lookbooks, and luxury wedding films. Crafting timeless visual narratives worldwide with master-grade lighting and precision color.
+            High-end cinematography, editorial lookbooks, and luxury wedding films. Crafting timeless visual narratives in Kabale, throughout Uganda, and worldwide.
           </p>
           <div className="flex items-center gap-3 text-slate-400">
             <a
-              href="https://instagram.com"
+              href="https://instagram.com/aimimages_hd_photography"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow Aim Images on Instagram"
@@ -62,7 +59,7 @@ export function Footer() {
               <Instagram className="w-4 h-4" />
             </a>
             <a
-              href="https://youtube.com"
+              href="https://youtube.com/@AimImagesphotography"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Subscribe to Aim Images on YouTube"
@@ -71,7 +68,16 @@ export function Footer() {
               <Youtube className="w-4 h-4" />
             </a>
             <a
-              href="mailto:contact@aimimages.com"
+              href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20your%20services."
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Chat with Aim Images on WhatsApp"
+              className="min-w-[44px] min-h-[44px] rounded-full border border-emerald-500/30 text-emerald-400 flex items-center justify-center hover:bg-emerald-500/10 transition-colors"
+            >
+              <Phone className="w-4 h-4" />
+            </a>
+            <a
+              href="mailto:aimugimages@gmail.com"
               aria-label="Email Aim Images Studio"
               className="min-w-[44px] min-h-[44px] rounded-full border border-white/10 flex items-center justify-center hover:text-gold-400 hover:border-gold-500/40 transition-colors"
             >
@@ -101,9 +107,14 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/contact" className="inline-block py-1.5 hover:text-gold-400 transition-colors">
-                Booking Inquiries
-              </Link>
+              <a
+                href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block py-1.5 hover:text-gold-400 transition-colors"
+              >
+                Booking Inquiries (WhatsApp)
+              </a>
             </li>
             <li>
               <Link href="/admin/login" className="inline-block py-1.5 text-xs text-slate-600 hover:text-slate-400 transition-colors">
@@ -186,9 +197,11 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4 text-center sm:text-left">
         <p>© {new Date().getFullYear()} Aim Images HD Studio. All rights reserved.</p>
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-          <span>Available Worldwide</span>
+          <span>Rugarama Road, Kabale, Uganda</span>
           <span>•</span>
-          <span>Los Angeles • Paris • Milan</span>
+          <span>+256 764 709 563</span>
+          <span>•</span>
+          <span>Worldwide Commissions</span>
         </div>
       </div>
     </footer>

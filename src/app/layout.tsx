@@ -1,8 +1,9 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { Cinzel, Plus_Jakarta_Sans } from 'next/font/google';
 import '@/styles/globals.css';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
+import { FloatingWhatsApp } from '@/components/whatsapp-fab';
 
 const cinzel = Cinzel({
   subsets: ['latin'],
@@ -21,6 +22,10 @@ export const metadata: Metadata = {
   description: 'Aim Images HD is a world-class creative studio specializing in luxury wedding cinema, high-fashion editorial lookbooks, commercial advertising, and executive portraiture.',
   keywords: ['photography studio', 'cinematography', 'luxury wedding videography', 'editorial fashion', 'commercial brand films', 'aim images'],
   authors: [{ name: 'Aim Images HD Studio' }],
+  icons: {
+    icon: '/logo-emblem.png',
+    apple: '/logo-emblem.png',
+  },
   openGraph: {
     title: 'Aim Images | Luxury Cinema & Creative Photography Studio',
     description: 'Bespoke cinema, high-contrast editorial photography, and master-crafted visual storytelling.',
@@ -42,6 +47,7 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <FloatingWhatsApp />
       </body>
     </html>
   );

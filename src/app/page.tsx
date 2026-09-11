@@ -51,12 +51,14 @@ export default async function HomePage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
 
-              <Link
-                href="/contact"
+              <a
+                href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production."
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-obsidian-900/90 border border-white/20 hover:border-gold-500/60 text-cream-100 font-semibold text-xs uppercase tracking-widest transition-all duration-300 hover:bg-obsidian-850"
               >
                 <span>Inquire & Book</span>
-              </Link>
+              </a>
             </div>
 
             {/* Premium Availability Status Indicator */}
@@ -285,20 +287,20 @@ export default async function HomePage() {
 
           <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
-              <Link
-                href="/contact"
-                className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest transition-all shadow-[0_0_25px_rgba(212,175,55,0.3)]"
-              >
-                Submit Studio Brief
-              </Link>
               <a
-                href="https://wa.me/15552348900?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20a%20production."
+                href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20reserve%20a%20production%20date."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center px-8 py-4 rounded-full border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 font-semibold text-xs uppercase tracking-widest transition-all"
+                className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest transition-all shadow-[0_0_25px_rgba(212,175,55,0.3)]"
               >
-                Direct WhatsApp Inquiry
+                Inquire via WhatsApp
               </a>
+              <Link
+                href="/contact"
+                className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center px-8 py-4 rounded-full border border-white/20 hover:border-gold-500/60 text-cream-100 font-semibold text-xs uppercase tracking-widest transition-all hover:bg-obsidian-850"
+              >
+                Submit Project Brief
+              </Link>
             </div>
 
             <p className="text-[11px] sm:text-xs text-slate-400 tracking-wide pt-1">
