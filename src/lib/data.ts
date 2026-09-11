@@ -478,35 +478,43 @@ export const BTS_IMAGES = [
   }
 ];
 
+const dbUrl = process.env.DATABASE_URL;
+const hasActiveDatabase = Boolean(
+  dbUrl &&
+  !dbUrl.includes('localhost') &&
+  !dbUrl.includes('127.0.0.1') &&
+  !dbUrl.includes('dummy')
+);
+
 // Hybrid Repository Functions (PostgreSQL via Prisma with seamless fallback)
 export async function getProjects(): Promise<ProjectData[]> {
-  try {
-    if (process.env.DATABASE_URL) {
+  if (hasActiveDatabase) {
+    try {
       const dbProjects = await prisma.project.findMany({
         orderBy: { year: 'desc' }
       });
       if (dbProjects && dbProjects.length > 0) {
         return dbProjects as unknown as ProjectData[];
       }
+    } catch (err) {
+      console.warn('Prisma getProjects query failed, falling back to static studio data:', err);
     }
-  } catch (err) {
-    console.warn('Prisma getProjects query failed, falling back to static studio data:', err);
   }
   return INITIAL_PROJECTS;
 }
 
 export async function getProjectBySlug(slug: string): Promise<ProjectData | null> {
-  try {
-    if (process.env.DATABASE_URL) {
+  if (hasActiveDatabase) {
+    try {
       const dbProject = await prisma.project.findUnique({
         where: { slug }
       });
       if (dbProject) {
         return dbProject as unknown as ProjectData;
       }
+    } catch (err) {
+      console.warn('Prisma getProjectBySlug failed for ' + slug + ', falling back:', err);
     }
-  } catch (err) {
-    console.warn(`Prisma getProjectBySlug query failed for ${slug}, falling back:`, err);
   }
   const match = INITIAL_PROJECTS.find(p => p.slug === slug);
   return match || null;
