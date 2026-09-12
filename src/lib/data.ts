@@ -488,33 +488,30 @@ const hasActiveDatabase = Boolean(
 
 // Hybrid Repository Functions (PostgreSQL via Prisma with seamless fallback)
 export async function getProjects(): Promise<ProjectData[]> {
-  if (hasActiveDatabase) {
-    try {
-      const dbProjects = await prisma.project.findMany({
-        orderBy: { year: 'desc' }
-      });
-      if (dbProjects && dbProjects.length > 0) {
-        return dbProjects as unknown as ProjectData[];
-      }
-    } catch (err) {
-      console.warn('Prisma getProjects query failed, falling back to static studio data:', err);
+  try {
+    const dbProjects = await prisma.project.findMany({
+      where: { isDeleted: false, status: 'PUBLISHED' },
+      orderBy: [{ order: 'asc' }, { year: 'desc' }]
+    });
+    if (dbProjects && dbProjects.length > 0) {
+      return dbProjects as unknown as ProjectData[];
     }
+  } catch (err) {
+    // Database connection or table not ready, fallback gracefully
   }
   return INITIAL_PROJECTS;
 }
 
 export async function getProjectBySlug(slug: string): Promise<ProjectData | null> {
-  if (hasActiveDatabase) {
-    try {
-      const dbProject = await prisma.project.findUnique({
-        where: { slug }
-      });
-      if (dbProject) {
-        return dbProject as unknown as ProjectData;
-      }
-    } catch (err) {
-      console.warn('Prisma getProjectBySlug failed for ' + slug + ', falling back:', err);
+  try {
+    const dbProject = await prisma.project.findFirst({
+      where: { slug, isDeleted: false }
+    });
+    if (dbProject) {
+      return dbProject as unknown as ProjectData;
     }
+  } catch (err) {
+    // Fallback
   }
   const match = INITIAL_PROJECTS.find(p => p.slug === slug);
   return match || null;
@@ -524,3 +521,79 @@ export async function getFeaturedProjects(): Promise<ProjectData[]> {
   const projects = await getProjects();
   return projects.filter(p => p.featured);
 }
+
+export async function getServices(): Promise<ServiceData[]> {
+  try {
+    const dbServices = await prisma.service.findMany({
+      where: { isDeleted: false, status: 'PUBLISHED' },
+      orderBy: { order: 'asc' },
+    });
+    if (dbServices && dbServices.length > 0) {
+      return dbServices as unknown as ServiceData[];
+    }
+  } catch (err) {
+    // Fallback
+  }
+  return SERVICES;
+}
+
+export async function getTestimonials(): Promise<TestimonialData[]> {
+  try {
+    const dbTestimonials = await prisma.testimonial.findMany({
+      where: { isDeleted: false },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (dbTestimonials && dbTestimonials.length > 0) {
+      return dbTestimonials as unknown as TestimonialData[];
+    }
+  } catch (err) {
+    // Fallback
+  }
+  return TESTIMONIALS;
+}
+
+export async function getTeamMembers(): Promise<TeamMemberData[]> {
+  try {
+    const dbTeam = await prisma.teamMember.findMany({
+      where: { isDeleted: false },
+      orderBy: { order: 'asc' },
+    });
+    if (dbTeam && dbTeam.length > 0) {
+      return dbTeam as unknown as TeamMemberData[];
+    }
+  } catch (err) {
+    // Fallback
+  }
+  return TEAM_MEMBERS;
+}
+
+export async function getSiteSettings(): Promise<Record<string, any>> {
+  const defaults: Record<string, any> = {
+    brand_name: 'Aim Images HD',
+    brand_tagline: 'Where Light Meets Timeless Storytelling',
+    booking_status: 'Bookings Open',
+    contact_phone: '+256 764 709 563',
+    contact_whatsapp: '+256 764 709 563',
+    contact_email: 'aimugimages@gmail.com',
+    studio_address: 'Rugarama Road, Kabale, Uganda',
+    google_maps_url: 'https://maps.google.com/?q=Rugarama+Road,+Kabale,+Uganda',
+    instagram_url: 'https://instagram.com/aimimages',
+    youtube_url: 'https://youtube.com/@aimimages',
+    vimeo_url: 'https://vimeo.com/aimimages',
+  };
+
+  try {
+    const settings = await prisma.siteSetting.findMany();
+    if (settings && settings.length > 0) {
+      const mapped: Record<string, any> = { ...defaults };
+      for (const s of settings) {
+        mapped[s.key] = s.value;
+      }
+      return mapped;
+    }
+  } catch (err) {
+    // Fallback to defaults
+  }
+  return defaults;
+}
+
