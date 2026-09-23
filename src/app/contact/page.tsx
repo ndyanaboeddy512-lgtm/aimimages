@@ -3,6 +3,8 @@ import { BookingForm } from '@/components/booking-form';
 import { Mail, Phone, MapPin, Clock, Globe, Shield, MessageSquare, Sparkles } from 'lucide-react';
 import { getSiteSettings } from '@/lib/data';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ContactPage() {
   const settings = await getSiteSettings();
   const studioAddress = settings.studio_address || 'Rugarama Road, Kabale, Uganda';

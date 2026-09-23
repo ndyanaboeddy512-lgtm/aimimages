@@ -4,6 +4,8 @@ import { getServices, getSiteSettings, SERVICES, FAQS } from '@/lib/data';
 import { FAQAccordion } from '@/components/faq-accordion';
 import { CheckCircle2, ArrowRight, Sparkles, Clock, Compass, Shield, Award } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ServicesPage() {
   const [servicesData, settings] = await Promise.all([
     getServices(),

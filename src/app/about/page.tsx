@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { getTeamMembers, getSiteSettings, TEAM_MEMBERS, STATS, BTS_IMAGES } from '@/lib/data';
 import { Sparkles, Camera, Film, Award, Heart, CheckCircle2, ArrowRight } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AboutPage() {
   const [teamMembersData, settings] = await Promise.all([
     getTeamMembers(),

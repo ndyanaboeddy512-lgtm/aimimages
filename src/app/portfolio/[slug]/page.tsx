@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Calendar, MapPin, Film, CheckCircle2 } from 'lucide-react';
 import { getProjectBySlug, getProjects, getSiteSettings } from '@/lib/data';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProjectDetailPage({
   params,
 }: {

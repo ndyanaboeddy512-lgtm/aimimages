@@ -6,6 +6,8 @@ import { getFeaturedProjects, getServices, getTestimonials, getSiteSettings, SER
 import { ProjectCard } from '@/components/project-card';
 import { TestimonialSlider } from '@/components/testimonial-slider';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   const [featuredProjects, servicesData, testimonialsData, settings] = await Promise.all([
     getFeaturedProjects(),
