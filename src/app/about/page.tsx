@@ -1,10 +1,12 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { TEAM_MEMBERS, STATS, BTS_IMAGES } from '@/lib/data';
+import { getTeamMembers, TEAM_MEMBERS, STATS, BTS_IMAGES } from '@/lib/data';
 import { Sparkles, Camera, Film, Award, Heart, CheckCircle2, ArrowRight } from 'lucide-react';
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const teamMembersData = await getTeamMembers();
+  const teamMembers = teamMembersData && teamMembersData.length > 0 ? teamMembersData : TEAM_MEMBERS;
   const values = [
     {
       title: 'Emotive Realism',
@@ -110,7 +112,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            {TEAM_MEMBERS.map((member) => (
+            {teamMembers.map((member) => (
               <div
                 key={member.id}
                 className="rounded-2xl overflow-hidden bg-obsidian-850 border border-white/10 hover:border-gold-500/40 transition-all duration-300 group flex flex-col justify-between"

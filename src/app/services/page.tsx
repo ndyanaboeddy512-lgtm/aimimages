@@ -1,10 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
-import { SERVICES, FAQS } from '@/lib/data';
+import { getServices, SERVICES, FAQS } from '@/lib/data';
 import { FAQAccordion } from '@/components/faq-accordion';
 import { CheckCircle2, ArrowRight, Sparkles, Clock, Compass, Shield, Award } from 'lucide-react';
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const servicesData = await getServices();
+  const services = servicesData && servicesData.length > 0 ? servicesData : SERVICES;
+
   const steps = [
     {
       num: '01',
@@ -46,7 +49,7 @@ export default function ServicesPage() {
 
       {/* Services Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-        {SERVICES.map((service) => (
+        {services.map((service) => (
           <div
             key={service.id}
             className="p-6 sm:p-8 rounded-2xl bg-obsidian-850 border border-white/10 hover:border-gold-500/40 transition-all duration-300 flex flex-col justify-between space-y-6 sm:space-y-8"

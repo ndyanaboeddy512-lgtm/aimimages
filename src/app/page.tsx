@@ -2,12 +2,23 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Play, Sparkles, Film, Camera, ShieldCheck, Globe, Star } from 'lucide-react';
-import { getFeaturedProjects, SERVICES, TESTIMONIALS, STATS, BTS_IMAGES } from '@/lib/data';
+import { getFeaturedProjects, getServices, getTestimonials, getSiteSettings, SERVICES, TESTIMONIALS, STATS, BTS_IMAGES } from '@/lib/data';
 import { ProjectCard } from '@/components/project-card';
 import { TestimonialSlider } from '@/components/testimonial-slider';
 
 export default async function HomePage() {
-  const featuredProjects = await getFeaturedProjects();
+  const [featuredProjects, servicesData, testimonialsData, settings] = await Promise.all([
+    getFeaturedProjects(),
+    getServices(),
+    getTestimonials(),
+    getSiteSettings(),
+  ]);
+
+  const services = servicesData && servicesData.length > 0 ? servicesData : SERVICES;
+  const testimonials = testimonialsData && testimonialsData.length > 0 ? testimonialsData : TESTIMONIALS;
+  const bookingStatus = settings.booking_status || 'Bookings Open';
+  const waNumber = (settings.contact_whatsapp || '256764709563').replace(/[^0-9]/g, '');
+  const heroSub = settings.hero_subheadline || settings.brand_tagline || 'Aim Images HD crafts breathtaking wedding documentaries, high-fashion editorial campaigns, and cinematic commercial films across the globe.';
 
   return (
     <div className="space-y-16 sm:space-y-24 md:space-y-32">
@@ -29,7 +40,7 @@ export default async function HomePage() {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-6 sm:space-y-8 animate-fade-in">
           <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full border border-gold-500/40 bg-obsidian-900/80 backdrop-blur-md text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] sm:tracking-[0.25em] text-gold-400 shadow-xl max-w-full">
             <Sparkles className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate sm:whitespace-normal">Worldwide Studio • Bookings Open</span>
+            <span className="truncate sm:whitespace-normal">Worldwide Studio • {bookingStatus}</span>
           </div>
 
           <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-cream-50 leading-[1.15] sm:leading-[1.1] break-words">
@@ -38,7 +49,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-slate-300 font-light leading-relaxed">
-            Aim Images HD crafts breathtaking wedding documentaries, high-fashion editorial campaigns, and cinematic commercial films across the globe.
+            {heroSub}
           </p>
 
           <div className="pt-2 sm:pt-4 flex flex-col items-center justify-center gap-3 sm:gap-4">
@@ -52,7 +63,7 @@ export default async function HomePage() {
               </Link>
 
               <a
-                href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production."
+                href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-obsidian-900/90 border border-white/20 hover:border-gold-500/60 text-cream-100 font-semibold text-xs uppercase tracking-widest transition-all duration-300 hover:bg-obsidian-850"
@@ -65,7 +76,7 @@ export default async function HomePage() {
             <div className="inline-flex items-center gap-2 pt-1 text-xs text-slate-400">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium tracking-wide">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                <span>Bookings Open</span>
+                <span>{bookingStatus}</span>
               </span>
               <span className="text-slate-600">•</span>
               <span className="text-slate-400 text-[11px] sm:text-xs tracking-wider uppercase">Worldwide Commissions</span>
@@ -132,7 +143,7 @@ export default async function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {SERVICES.map((service) => (
+          {services.slice(0, 6).map((service) => (
             <div
               key={service.id}
               className="p-6 sm:p-8 rounded-2xl bg-obsidian-850 border border-white/10 hover:border-gold-500/40 transition-all duration-300 flex flex-col justify-between group"
@@ -266,7 +277,7 @@ export default async function HomePage() {
           </h2>
         </div>
 
-        <TestimonialSlider items={TESTIMONIALS} />
+        <TestimonialSlider items={testimonials} />
       </section>
 
       {/* Call to Action Banner */}
@@ -275,7 +286,7 @@ export default async function HomePage() {
           <div className="max-w-2xl mx-auto space-y-3 sm:space-y-4">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <span>Bookings Open</span>
+              <span>{bookingStatus}</span>
             </div>
             <h2 className="font-serif text-2xl sm:text-4xl md:text-5xl font-bold text-cream-50 leading-tight break-words">
               Ready to create something unforgettable?
@@ -288,7 +299,7 @@ export default async function HomePage() {
           <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
               <a
-                href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20reserve%20a%20production%20date."
+                href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20reserve%20a%20production%20date.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest transition-all shadow-[0_0_25px_rgba(212,175,55,0.3)]"
@@ -304,7 +315,7 @@ export default async function HomePage() {
             </div>
 
             <p className="text-[11px] sm:text-xs text-slate-400 tracking-wide pt-1">
-              <span className="text-gold-400 font-medium">Bookings Open</span> — Private dates reserved on a first-confirmed basis
+              <span className="text-gold-400 font-medium">{bookingStatus}</span> — Private dates reserved on a first-confirmed basis
             </p>
           </div>
         </div>

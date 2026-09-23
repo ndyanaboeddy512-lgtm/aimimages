@@ -489,11 +489,12 @@ const hasActiveDatabase = Boolean(
 // Hybrid Repository Functions (PostgreSQL via Prisma with seamless fallback)
 export async function getProjects(): Promise<ProjectData[]> {
   try {
-    const dbProjects = await prisma.project.findMany({
-      where: { isDeleted: false, status: 'PUBLISHED' },
-      orderBy: [{ order: 'asc' }, { year: 'desc' }]
-    });
-    if (dbProjects && dbProjects.length > 0) {
+    const totalCount = await prisma.project.count();
+    if (totalCount > 0) {
+      const dbProjects = await prisma.project.findMany({
+        where: { isDeleted: false, status: 'PUBLISHED' },
+        orderBy: [{ order: 'asc' }, { year: 'desc' }, { createdAt: 'desc' }]
+      });
       return dbProjects as unknown as ProjectData[];
     }
   } catch (err) {
@@ -524,11 +525,12 @@ export async function getFeaturedProjects(): Promise<ProjectData[]> {
 
 export async function getServices(): Promise<ServiceData[]> {
   try {
-    const dbServices = await prisma.service.findMany({
-      where: { isDeleted: false, status: 'PUBLISHED' },
-      orderBy: { order: 'asc' },
-    });
-    if (dbServices && dbServices.length > 0) {
+    const totalCount = await prisma.service.count();
+    if (totalCount > 0) {
+      const dbServices = await prisma.service.findMany({
+        where: { isDeleted: false, status: 'PUBLISHED' },
+        orderBy: { order: 'asc' },
+      });
       return dbServices as unknown as ServiceData[];
     }
   } catch (err) {
@@ -539,11 +541,12 @@ export async function getServices(): Promise<ServiceData[]> {
 
 export async function getTestimonials(): Promise<TestimonialData[]> {
   try {
-    const dbTestimonials = await prisma.testimonial.findMany({
-      where: { isDeleted: false },
-      orderBy: { createdAt: 'desc' },
-    });
-    if (dbTestimonials && dbTestimonials.length > 0) {
+    const totalCount = await prisma.testimonial.count();
+    if (totalCount > 0) {
+      const dbTestimonials = await prisma.testimonial.findMany({
+        where: { isDeleted: false, status: 'PUBLISHED' },
+        orderBy: [{ featured: 'desc' }, { order: 'asc' }, { createdAt: 'desc' }],
+      });
       return dbTestimonials as unknown as TestimonialData[];
     }
   } catch (err) {
@@ -554,11 +557,12 @@ export async function getTestimonials(): Promise<TestimonialData[]> {
 
 export async function getTeamMembers(): Promise<TeamMemberData[]> {
   try {
-    const dbTeam = await prisma.teamMember.findMany({
-      where: { isDeleted: false },
-      orderBy: { order: 'asc' },
-    });
-    if (dbTeam && dbTeam.length > 0) {
+    const totalCount = await prisma.teamMember.count();
+    if (totalCount > 0) {
+      const dbTeam = await prisma.teamMember.findMany({
+        where: { isDeleted: false },
+        orderBy: { order: 'asc' },
+      });
       return dbTeam as unknown as TeamMemberData[];
     }
   } catch (err) {
@@ -567,10 +571,56 @@ export async function getTeamMembers(): Promise<TeamMemberData[]> {
   return TEAM_MEMBERS;
 }
 
+export function normalizeSettings(rawMap: Record<string, any>, defaults: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = { ...defaults };
+
+  for (const [k, v] of Object.entries(rawMap)) {
+    result[k] = v;
+  }
+
+  if (rawMap.site_identity && typeof rawMap.site_identity === 'object') {
+    if (!rawMap.brand_name && rawMap.site_identity.studioName) result.brand_name = rawMap.site_identity.studioName;
+    if (!rawMap.brand_tagline && rawMap.site_identity.tagline) result.brand_tagline = rawMap.site_identity.tagline;
+    if (!rawMap.hero_headline && rawMap.site_identity.heroHeadline) result.hero_headline = rawMap.site_identity.heroHeadline;
+    if (!rawMap.hero_subheadline && rawMap.site_identity.heroSubheadline) result.hero_subheadline = rawMap.site_identity.heroSubheadline;
+  }
+
+  if (rawMap.booking_availability && typeof rawMap.booking_availability === 'object') {
+    if (!rawMap.booking_status && (rawMap.booking_availability.statusText || rawMap.booking_availability.statusBadge)) {
+      result.booking_status = rawMap.booking_availability.statusText || rawMap.booking_availability.statusBadge;
+    }
+  }
+
+  if (rawMap.studio_coordinates && typeof rawMap.studio_coordinates === 'object') {
+    if (!rawMap.studio_address && rawMap.studio_coordinates.address) result.studio_address = rawMap.studio_coordinates.address;
+    if (!rawMap.contact_phone && rawMap.studio_coordinates.phone) result.contact_phone = rawMap.studio_coordinates.phone;
+    if (!rawMap.contact_whatsapp && rawMap.studio_coordinates.whatsapp) result.contact_whatsapp = rawMap.studio_coordinates.whatsapp;
+    if (!rawMap.contact_email && rawMap.studio_coordinates.email) result.contact_email = rawMap.studio_coordinates.email;
+  }
+
+  if (rawMap.maps_navigation && typeof rawMap.maps_navigation === 'object') {
+    if (!rawMap.google_maps_url && rawMap.maps_navigation.directionsUrl) result.google_maps_url = rawMap.maps_navigation.directionsUrl;
+  }
+
+  if (rawMap.social_profiles && typeof rawMap.social_profiles === 'object') {
+    if (!rawMap.instagram_url && rawMap.social_profiles.instagram) result.instagram_url = rawMap.social_profiles.instagram;
+    if (!rawMap.youtube_url && rawMap.social_profiles.youtube) result.youtube_url = rawMap.social_profiles.youtube;
+  }
+
+  if (rawMap.seo_meta && typeof rawMap.seo_meta === 'object') {
+    if (!rawMap.seo_title && rawMap.seo_meta.title) result.seo_title = rawMap.seo_meta.title;
+    if (!rawMap.seo_description && rawMap.seo_meta.description) result.seo_description = rawMap.seo_meta.description;
+  }
+
+  return result;
+}
+
 export async function getSiteSettings(): Promise<Record<string, any>> {
   const defaults: Record<string, any> = {
     brand_name: 'Aim Images HD',
     brand_tagline: 'Where Light Meets Timeless Storytelling',
+    hero_headline: 'Where Light Meets Timeless Storytelling',
+    hero_subheadline: 'Aim Images HD crafts breathtaking wedding documentaries, high-fashion editorial campaigns, and cinematic commercial films across the globe.',
     booking_status: 'Bookings Open',
     contact_phone: '+256 764 709 563',
     contact_whatsapp: '+256 764 709 563',
@@ -580,20 +630,23 @@ export async function getSiteSettings(): Promise<Record<string, any>> {
     instagram_url: 'https://instagram.com/aimimages',
     youtube_url: 'https://youtube.com/@aimimages',
     vimeo_url: 'https://vimeo.com/aimimages',
+    seo_title: 'Aim Images HD | Luxury Wedding Cinema & Haute Couture Photography',
+    seo_description: 'Aim Images HD is an internationally recognized visual media studio based in Kabale, Uganda, crafting high-end wedding documentaries and editorial campaigns worldwide.',
   };
 
   try {
     const settings = await prisma.siteSetting.findMany();
     if (settings && settings.length > 0) {
-      const mapped: Record<string, any> = { ...defaults };
+      const rawMap: Record<string, any> = {};
       for (const s of settings) {
-        mapped[s.key] = s.value;
+        rawMap[s.key] = s.value;
       }
-      return mapped;
+      return normalizeSettings(rawMap, defaults);
     }
   } catch (err) {
     // Fallback to defaults
   }
   return defaults;
 }
+
 

@@ -1,8 +1,15 @@
 import React from 'react';
 import { BookingForm } from '@/components/booking-form';
 import { Mail, Phone, MapPin, Clock, Globe, Shield, MessageSquare, Sparkles } from 'lucide-react';
+import { getSiteSettings } from '@/lib/data';
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const settings = await getSiteSettings();
+  const studioAddress = settings.studio_address || 'Rugarama Road, Kabale, Uganda';
+  const contactEmail = settings.contact_email || 'aimugimages@gmail.com';
+  const contactWhatsApp = settings.contact_whatsapp || '+256 764 709 563';
+  const waNumber = contactWhatsApp.replace(/[^0-9]/g, '');
+
   return (
     <div className="pt-28 sm:pt-32 pb-20 sm:pb-24 space-y-12 sm:space-y-16">
       {/* Header */}
@@ -33,7 +40,7 @@ export default function ContactPage() {
                 <MapPin className="w-5 h-5 text-gold-500 shrink-0 mt-0.5" />
                 <div>
                   <span className="block text-[11px] uppercase tracking-wider text-slate-500">Studio Location</span>
-                  <span className="font-medium text-cream-100">Rugarama Road, Kabale, Uganda</span>
+                  <span className="font-medium text-cream-100">{studioAddress}</span>
                   <span className="block text-xs text-slate-400">Available throughout Uganda & Worldwide</span>
                 </div>
               </div>
@@ -43,10 +50,10 @@ export default function ContactPage() {
                 <div>
                   <span className="block text-[11px] uppercase tracking-wider text-slate-500">Executive Email</span>
                   <a
-                    href="mailto:aimugimages@gmail.com"
+                    href={`mailto:${contactEmail}`}
                     className="font-medium text-cream-100 hover:text-gold-400 transition-colors inline-block py-1 min-h-[36px]"
                   >
-                    aimugimages@gmail.com
+                    {contactEmail}
                   </a>
                 </div>
               </div>
@@ -56,12 +63,12 @@ export default function ContactPage() {
                 <div>
                   <span className="block text-[11px] uppercase tracking-wider text-slate-500">Phone / WhatsApp Line</span>
                   <a
-                    href="https://wa.me/256764709563"
+                    href={`https://wa.me/${waNumber}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-medium text-cream-100 hover:text-emerald-400 transition-colors inline-block py-1 min-h-[36px]"
                   >
-                    +256 764 709 563
+                    {contactWhatsApp}
                   </a>
                 </div>
               </div>

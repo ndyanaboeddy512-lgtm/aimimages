@@ -9,9 +9,9 @@ export async function GET(req: NextRequest) {
     await requireAuth();
 
     const { searchParams } = new URL(req.url);
-    const search = searchParams.get('q') || '';
+    const search = searchParams.get('search') || searchParams.get('q') || '';
     const category = searchParams.get('category') || '';
-    const type = searchParams.get('type') || ''; // 'image' | 'video'
+    const type = (searchParams.get('type') || '').toLowerCase(); // 'image' | 'photo' | 'video'
     const status = searchParams.get('status') || '';
     const projectId = searchParams.get('projectId') || '';
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       where.category = category;
     }
 
-    if (type === 'image') {
+    if (type === 'image' || type === 'photo') {
       where.isVideo = false;
     } else if (type === 'video') {
       where.isVideo = true;
@@ -67,6 +67,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       items,
+      mediaItems: items,
       total,
       page,
       limit,

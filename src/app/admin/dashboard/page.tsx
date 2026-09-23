@@ -251,7 +251,14 @@ export default function AdminDashboardPage() {
       const res = await fetch('/api/admin/stats');
       if (res.ok) {
         const data = await res.json();
-        setStats(data);
+        setStats({
+          mediaCount: data.metrics?.totalMedia ?? data.mediaCount ?? 0,
+          projectsCount: data.metrics?.totalProjects ?? data.projectsCount ?? 0,
+          servicesCount: data.metrics?.totalServices ?? data.servicesCount ?? 0,
+          pendingInquiriesCount: data.metrics?.pendingEnquiries ?? data.pendingInquiriesCount ?? 0,
+          storageSizeFormatted: data.metrics?.storageFormatted ?? data.storageSizeFormatted ?? '0.00 MB',
+          recentAudits: data.recentAudits || [],
+        });
       }
     } catch (err) {
       console.warn('Stats fetch error:', err);
@@ -270,7 +277,7 @@ export default function AdminDashboardPage() {
       const res = await fetch(`/api/admin/media?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
-        setMediaItems(data.mediaItems || []);
+        setMediaItems(data.items || data.mediaItems || []);
       }
     } catch (err) {
       console.warn('Media fetch error:', err);
@@ -396,6 +403,247 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       console.warn('Users fetch error:', err);
+    }
+  };
+
+  // Media Item Save & Status Toggle
+  const handleSaveMedia = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeMediaItem) return;
+
+    try {
+      const res = await fetch(`/api/admin/media/${activeMediaItem.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: activeMediaItem.title,
+          category: activeMediaItem.category,
+          tags: typeof activeMediaItem.tags === 'string'
+            ? activeMediaItem.tags.split(',').map((t: string) => t.trim()).filter(Boolean)
+            : activeMediaItem.tags,
+          altText: activeMediaItem.altText,
+          description: activeMediaItem.description,
+          location: activeMediaItem.location,
+          featured: activeMediaItem.featured,
+          status: activeMediaItem.status,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to update media item');
+      }
+
+      showNotification('Media details updated successfully!');
+      setIsMediaEditModalOpen(false);
+      fetchMedia();
+    } catch (err: any) {
+      showNotification(err.message || 'Error updating media', 'error');
+    }
+  };
+
+  const toggleMediaStatus = async (item: any) => {
+    const newStatus = item.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+    try {
+      const res = await fetch(`/api/admin/media/${item.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        showNotification(`Media item ${newStatus === 'PUBLISHED' ? 'published' : 'set to draft'}.`);
+        fetchMedia();
+      }
+    } catch {
+      showNotification('Failed to toggle status', 'error');
+    }
+  };
+
+  // Project Save & Status Toggle
+  const handleSaveProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject) return;
+
+    try {
+      const isNew = !editingProject.id;
+      const url = isNew ? '/api/admin/projects' : `/api/admin/projects/${editingProject.id}`;
+      const method = isNew ? 'POST' : 'PATCH';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: editingProject.title,
+          category: editingProject.category || 'Weddings',
+          client: editingProject.client,
+          year: editingProject.year ? parseInt(editingProject.year) : new Date().getFullYear(),
+          location: editingProject.location,
+          coverImage: editingProject.coverImage || 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1600',
+          videoUrl: editingProject.videoUrl,
+          duration: editingProject.duration,
+          isVideo: Boolean(editingProject.isVideo),
+          featured: Boolean(editingProject.featured),
+          status: editingProject.status || 'PUBLISHED',
+          description: editingProject.description,
+          deliverables: Array.isArray(editingProject.deliverables)
+            ? editingProject.deliverables
+            : typeof editingProject.deliverables === 'string'
+            ? editingProject.deliverables.split('\n').map((s: string) => s.trim()).filter(Boolean)
+            : [],
+          gearUsed: Array.isArray(editingProject.gearUsed)
+            ? editingProject.gearUsed
+            : typeof editingProject.gearUsed === 'string'
+            ? editingProject.gearUsed.split('\n').map((s: string) => s.trim()).filter(Boolean)
+            : [],
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to save project');
+      }
+
+      showNotification(`Project ${isNew ? 'created' : 'updated'} successfully!`);
+      setIsProjectModalOpen(false);
+      setEditingProject(null);
+      fetchProjects();
+      fetchStats();
+    } catch (err: any) {
+      showNotification(err.message || 'Error saving project', 'error');
+    }
+  };
+
+  const toggleProjectStatus = async (proj: any) => {
+    const newStatus = proj.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+    try {
+      const res = await fetch(`/api/admin/projects/${proj.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        showNotification(`Project ${newStatus === 'PUBLISHED' ? 'published' : 'unpublished'}.`);
+        fetchProjects();
+      }
+    } catch {
+      showNotification('Failed to toggle status', 'error');
+    }
+  };
+
+  // Service Save & Status Toggle
+  const handleSaveService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingService) return;
+
+    try {
+      const isNew = !editingService.id;
+      const url = isNew ? '/api/admin/services' : `/api/admin/services/${editingService.id}`;
+      const method = isNew ? 'POST' : 'PATCH';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: editingService.title,
+          tagline: editingService.tagline,
+          startingPrice: editingService.startingPrice,
+          timeline: editingService.timeline,
+          description: editingService.description,
+          icon: editingService.icon || 'Camera',
+          status: editingService.status || 'PUBLISHED',
+          order: editingService.order !== undefined ? parseInt(editingService.order) : 0,
+          deliverables: Array.isArray(editingService.deliverables)
+            ? editingService.deliverables
+            : typeof editingService.deliverables === 'string'
+            ? editingService.deliverables.split('\n').map((s: string) => s.trim()).filter(Boolean)
+            : [],
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to save service');
+      }
+
+      showNotification(`Service ${isNew ? 'created' : 'updated'} successfully!`);
+      setIsServiceModalOpen(false);
+      setEditingService(null);
+      fetchServices();
+      fetchStats();
+    } catch (err: any) {
+      showNotification(err.message || 'Error saving service', 'error');
+    }
+  };
+
+  const toggleServiceStatus = async (srv: any) => {
+    const newStatus = srv.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+    try {
+      const res = await fetch(`/api/admin/services/${srv.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        showNotification(`Service ${newStatus === 'PUBLISHED' ? 'published' : 'unpublished'}.`);
+        fetchServices();
+      }
+    } catch {
+      showNotification('Failed to toggle status', 'error');
+    }
+  };
+
+  // Testimonial Save & Status Toggle
+  const handleSaveTestimonial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTestimonial) return;
+
+    try {
+      const isNew = !editingTestimonial.id;
+      const url = isNew ? '/api/admin/testimonials' : `/api/admin/testimonials/${editingTestimonial.id}`;
+      const method = isNew ? 'POST' : 'PATCH';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: editingTestimonial.clientName,
+          roleOrEvent: editingTestimonial.roleOrEvent,
+          comment: editingTestimonial.comment,
+          rating: editingTestimonial.rating ? parseInt(editingTestimonial.rating) : 5,
+          avatar: editingTestimonial.avatar,
+          featured: Boolean(editingTestimonial.featured),
+          status: editingTestimonial.status || 'PUBLISHED',
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to save testimonial');
+      }
+
+      showNotification(`Testimonial ${isNew ? 'added' : 'updated'} successfully!`);
+      setIsTestimonialModalOpen(false);
+      setEditingTestimonial(null);
+      fetchTestimonials();
+    } catch (err: any) {
+      showNotification(err.message || 'Error saving testimonial', 'error');
+    }
+  };
+
+  const toggleTestimonialStatus = async (t: any) => {
+    const newStatus = t.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+    try {
+      const res = await fetch(`/api/admin/testimonials/${t.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (res.ok) {
+        showNotification(`Testimonial ${newStatus === 'PUBLISHED' ? 'published' : 'unpublished'}.`);
+        fetchTestimonials();
+      }
+    } catch {
+      showNotification('Failed to toggle status', 'error');
     }
   };
 
@@ -1229,15 +1477,17 @@ export default function AdminDashboardPage() {
                           </div>
 
                           <div className="absolute top-2 right-2">
-                            <span
-                              className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                            <button
+                              onClick={() => toggleMediaStatus(item)}
+                              title="Click to toggle Published/Draft"
+                              className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
                                 item.status === 'PUBLISHED'
-                                  ? 'bg-emerald-500/80 text-white'
-                                  : 'bg-amber-500/80 text-obsidian-950'
+                                  ? 'bg-emerald-500/80 text-white hover:bg-emerald-600'
+                                  : 'bg-amber-500/80 text-obsidian-950 hover:bg-amber-600'
                               }`}
                             >
                               {item.status}
-                            </span>
+                            </button>
                           </div>
                         </div>
 
@@ -1348,10 +1598,21 @@ export default function AdminDashboardPage() {
                             className="object-cover"
                           />
                         )}
-                        <div className="absolute top-2 right-2">
+                        <div className="absolute top-2 right-2 flex items-center gap-1.5">
                           <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-gold-500 text-obsidian-950">
                             {proj.category}
                           </span>
+                          <button
+                            onClick={() => toggleProjectStatus(proj)}
+                            title="Click to toggle Published/Draft"
+                            className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                              proj.status === 'PUBLISHED'
+                                ? 'bg-emerald-500/80 text-white hover:bg-emerald-600'
+                                : 'bg-amber-500/80 text-obsidian-950 hover:bg-amber-600'
+                            }`}
+                          >
+                            {proj.status || 'PUBLISHED'}
+                          </button>
                         </div>
                       </div>
 
@@ -1441,9 +1702,22 @@ export default function AdminDashboardPage() {
                         <div className="w-10 h-10 rounded-xl bg-gold-500/10 border border-gold-500/30 flex items-center justify-center text-gold-400">
                           <Camera className="w-5 h-5" />
                         </div>
-                        <span className="font-serif text-xl font-bold text-gold-400">
-                          {srv.startingPrice}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => toggleServiceStatus(srv)}
+                            title="Click to toggle Published/Draft"
+                            className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                              srv.status === 'PUBLISHED'
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            }`}
+                          >
+                            {srv.status || 'PUBLISHED'}
+                          </button>
+                          <span className="font-serif text-xl font-bold text-gold-400">
+                            {srv.startingPrice}
+                          </span>
+                        </div>
                       </div>
 
                       <h3 className="font-serif text-base font-bold text-cream-50">{srv.title}</h3>
@@ -1894,11 +2168,24 @@ export default function AdminDashboardPage() {
                             <Star key={i} className="w-3.5 h-3.5 fill-current" />
                           ))}
                         </div>
-                        {t.featured && (
-                          <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-gold-500/20 text-gold-400 border border-gold-500/30">
-                            Featured
-                          </span>
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          {t.featured && (
+                            <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-gold-500/20 text-gold-400 border border-gold-500/30">
+                              Featured
+                            </span>
+                          )}
+                          <button
+                            onClick={() => toggleTestimonialStatus(t)}
+                            title="Click to toggle Published/Draft"
+                            className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                              t.status === 'PUBLISHED'
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            }`}
+                          >
+                            {t.status || 'PUBLISHED'}
+                          </button>
+                        </div>
                       </div>
 
                       <p className="text-xs text-slate-300 leading-relaxed italic">
@@ -2463,6 +2750,708 @@ export default function AdminDashboardPage() {
                   className="px-5 py-2 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold uppercase tracking-wider text-[11px]"
                 >
                   Create User
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 5: EDIT MEDIA MODAL */}
+      {/* ========================================================================= */}
+      {isMediaEditModalOpen && activeMediaItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-xl bg-obsidian-850 border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-cream-50">Edit Media Asset</h3>
+                <p className="text-xs text-slate-400 truncate max-w-xs">{activeMediaItem.title || 'Untitled Asset'}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setIsMediaEditModalOpen(false);
+                  setActiveMediaItem(null);
+                }}
+                className="p-1 text-slate-400 hover:text-cream-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveMedia} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Asset Title
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={activeMediaItem.title || ''}
+                  onChange={(e) => setActiveMediaItem({ ...activeMediaItem, title: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Category
+                  </label>
+                  <select
+                    value={activeMediaItem.category || 'Weddings'}
+                    onChange={(e) => setActiveMediaItem({ ...activeMediaItem, category: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  >
+                    {CATEGORIES.filter((c) => c !== 'All').map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Status
+                  </label>
+                  <select
+                    value={activeMediaItem.status || 'PUBLISHED'}
+                    onChange={(e) => setActiveMediaItem({ ...activeMediaItem, status: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  >
+                    <option value="PUBLISHED">Published (Live on site)</option>
+                    <option value="DRAFT">Draft (Hidden)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Tags (comma separated)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. bride, lake-como, golden-hour"
+                  value={Array.isArray(activeMediaItem.tags) ? activeMediaItem.tags.join(', ') : (activeMediaItem.tags || '')}
+                  onChange={(e) => setActiveMediaItem({ ...activeMediaItem, tags: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Lake Como, Italy"
+                  value={activeMediaItem.location || ''}
+                  onChange={(e) => setActiveMediaItem({ ...activeMediaItem, location: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Alt Text (SEO & Accessibility)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Descriptive text for accessibility"
+                  value={activeMediaItem.altText || ''}
+                  onChange={(e) => setActiveMediaItem({ ...activeMediaItem, altText: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Description
+                </label>
+                <textarea
+                  rows={2}
+                  value={activeMediaItem.description || ''}
+                  onChange={(e) => setActiveMediaItem({ ...activeMediaItem, description: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="mediaFeatured"
+                  checked={Boolean(activeMediaItem.featured)}
+                  onChange={(e) => setActiveMediaItem({ ...activeMediaItem, featured: e.target.checked })}
+                  className="rounded border-white/20 text-gold-500 focus:ring-0 cursor-pointer"
+                />
+                <label htmlFor="mediaFeatured" className="text-slate-300 text-xs cursor-pointer">
+                  Feature in portfolio highlights
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMediaEditModalOpen(false);
+                    setActiveMediaItem(null);
+                  }}
+                  className="px-4 py-2 rounded-full bg-obsidian-900 border border-white/10 text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold uppercase tracking-wider text-[11px]"
+                >
+                  Save Asset
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 6: CREATE / EDIT PROJECT MODAL */}
+      {/* ========================================================================= */}
+      {isProjectModalOpen && editingProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-2xl bg-obsidian-850 border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-cream-50">
+                  {editingProject.id ? 'Edit Portfolio Project' : 'Create New Portfolio Project'}
+                </h3>
+                <p className="text-xs text-slate-400">Configure case study metadata, media assets, and gear info.</p>
+              </div>
+              <button
+                onClick={() => {
+                  setIsProjectModalOpen(false);
+                  setEditingProject(null);
+                }}
+                className="p-1 text-slate-400 hover:text-cream-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProject} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Project Title
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. The Lake Como Vows"
+                    value={editingProject.title || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, title: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Category
+                  </label>
+                  <select
+                    value={editingProject.category || 'Weddings'}
+                    onChange={(e) => setEditingProject({ ...editingProject, category: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  >
+                    {CATEGORIES.filter((c) => c !== 'All').map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Client Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Victoria & Alexander"
+                    value={editingProject.client || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, client: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Year
+                  </label>
+                  <input
+                    type="number"
+                    value={editingProject.year || new Date().getFullYear()}
+                    onChange={(e) => setEditingProject({ ...editingProject, year: parseInt(e.target.value) || new Date().getFullYear() })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Lake Como, Italy"
+                    value={editingProject.location || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, location: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Cover Image URL
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="https://images.unsplash.com/..."
+                    value={editingProject.coverImage || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, coverImage: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Video URL (optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="https://player.vimeo.com/... or YouTube"
+                    value={editingProject.videoUrl || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, videoUrl: e.target.value, isVideo: Boolean(e.target.value) })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Duration (e.g. &ldquo;12 min film&rdquo;)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 12 min 4K Film"
+                    value={editingProject.duration || ''}
+                    onChange={(e) => setEditingProject({ ...editingProject, duration: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Publication Status
+                  </label>
+                  <select
+                    value={editingProject.status || 'PUBLISHED'}
+                    onChange={(e) => setEditingProject({ ...editingProject, status: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  >
+                    <option value="PUBLISHED">Published (Live on site)</option>
+                    <option value="DRAFT">Draft (Hidden)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Description / Story
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={editingProject.description || ''}
+                  onChange={(e) => setEditingProject({ ...editingProject, description: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Deliverables (one per line)
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="4K Master Film&#10;Teaser Trailer&#10;Master Retouched Stills"
+                    value={Array.isArray(editingProject.deliverables) ? editingProject.deliverables.join('\n') : (editingProject.deliverables || '')}
+                    onChange={(e) => setEditingProject({ ...editingProject, deliverables: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500 font-mono text-[11px]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Camera / Gear Used (one per line)
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="RED V-Raptor 8K&#10;Cooke Anamorphic /i&#10;DJI Ronin 2"
+                    value={Array.isArray(editingProject.gearUsed) ? editingProject.gearUsed.join('\n') : (editingProject.gearUsed || '')}
+                    onChange={(e) => setEditingProject({ ...editingProject, gearUsed: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500 font-mono text-[11px]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6 pt-1">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(editingProject.featured)}
+                    onChange={(e) => setEditingProject({ ...editingProject, featured: e.target.checked })}
+                    className="rounded border-white/20 text-gold-500 focus:ring-0 cursor-pointer"
+                  />
+                  <span>Feature on Homepage</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(editingProject.isVideo)}
+                    onChange={(e) => setEditingProject({ ...editingProject, isVideo: e.target.checked })}
+                    className="rounded border-white/20 text-gold-500 focus:ring-0 cursor-pointer"
+                  />
+                  <span>Mark as Cinema Film</span>
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsProjectModalOpen(false);
+                    setEditingProject(null);
+                  }}
+                  className="px-4 py-2 rounded-full bg-obsidian-900 border border-white/10 text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold uppercase tracking-wider text-[11px]"
+                >
+                  {editingProject.id ? 'Save Changes' : 'Create Project'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 7: CREATE / EDIT SERVICE MODAL */}
+      {/* ========================================================================= */}
+      {isServiceModalOpen && editingService && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-xl bg-obsidian-850 border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-cream-50">
+                  {editingService.id ? 'Edit Service Tier' : 'Add Service Tier'}
+                </h3>
+                <p className="text-xs text-slate-400">Configure studio deliverables, pricing, and turnaround time.</p>
+              </div>
+              <button
+                onClick={() => {
+                  setIsServiceModalOpen(false);
+                  setEditingService(null);
+                }}
+                className="p-1 text-slate-400 hover:text-cream-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveService} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Service Title
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Haute Couture & Editorial Cinema"
+                  value={editingService.title || ''}
+                  onChange={(e) => setEditingService({ ...editingService, title: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Tagline / Brief Subtitle
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Mastered for campaign launches, lookbooks, and luxury houses."
+                  value={editingService.tagline || ''}
+                  onChange={(e) => setEditingService({ ...editingService, tagline: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Starting Investment / Price
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. $4,500"
+                    value={editingService.startingPrice || ''}
+                    onChange={(e) => setEditingService({ ...editingService, startingPrice: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Turnaround Timeline
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 2 - 3 Weeks"
+                    value={editingService.timeline || ''}
+                    onChange={(e) => setEditingService({ ...editingService, timeline: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Service Description
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={editingService.description || ''}
+                  onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Deliverables (one per line)
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Master 4K Cinema Film&#10;Full Resolution Stills&#10;Social Teasers&#10;Private Online Archive"
+                  value={Array.isArray(editingService.deliverables) ? editingService.deliverables.join('\n') : (editingService.deliverables || '')}
+                  onChange={(e) => setEditingService({ ...editingService, deliverables: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500 font-mono text-[11px]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Display Order
+                  </label>
+                  <input
+                    type="number"
+                    value={editingService.order !== undefined ? editingService.order : 0}
+                    onChange={(e) => setEditingService({ ...editingService, order: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Status
+                  </label>
+                  <select
+                    value={editingService.status || 'PUBLISHED'}
+                    onChange={(e) => setEditingService({ ...editingService, status: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  >
+                    <option value="PUBLISHED">Published</option>
+                    <option value="DRAFT">Draft</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsServiceModalOpen(false);
+                    setEditingService(null);
+                  }}
+                  className="px-4 py-2 rounded-full bg-obsidian-900 border border-white/10 text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold uppercase tracking-wider text-[11px]"
+                >
+                  {editingService.id ? 'Save Changes' : 'Create Service'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* MODAL 8: CREATE / EDIT TESTIMONIAL MODAL */}
+      {/* ========================================================================= */}
+      {isTestimonialModalOpen && editingTestimonial && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in overflow-y-auto">
+          <div className="w-full max-w-xl bg-obsidian-850 border border-white/10 rounded-2xl p-6 space-y-4 shadow-2xl my-8">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-cream-50">
+                  {editingTestimonial.id ? 'Edit Client Review' : 'Add Client Review'}
+                </h3>
+                <p className="text-xs text-slate-400">Curate client endorsements, quotes, and star ratings.</p>
+              </div>
+              <button
+                onClick={() => {
+                  setIsTestimonialModalOpen(false);
+                  setEditingTestimonial(null);
+                }}
+                className="p-1 text-slate-400 hover:text-cream-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveTestimonial} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Client / Couple Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Victoria & Alexander"
+                    value={editingTestimonial.clientName || ''}
+                    onChange={(e) => setEditingTestimonial({ ...editingTestimonial, clientName: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Role or Event
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Destination Wedding, Lake Como"
+                    value={editingTestimonial.roleOrEvent || ''}
+                    onChange={(e) => setEditingTestimonial({ ...editingTestimonial, roleOrEvent: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Client Testimonial / Quote
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  placeholder="&ldquo;Aim Images captured our celebration with extraordinary elegance...&rdquo;"
+                  value={editingTestimonial.comment || ''}
+                  onChange={(e) => setEditingTestimonial({ ...editingTestimonial, comment: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Star Rating (1 - 5)
+                  </label>
+                  <select
+                    value={editingTestimonial.rating || 5}
+                    onChange={(e) => setEditingTestimonial({ ...editingTestimonial, rating: parseInt(e.target.value) || 5 })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  >
+                    <option value={5}>★★★★★ (5 Stars - Exceptional)</option>
+                    <option value={4}>★★★★☆ (4 Stars - Great)</option>
+                    <option value={3}>★★★☆☆ (3 Stars - Average)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                    Status
+                  </label>
+                  <select
+                    value={editingTestimonial.status || 'PUBLISHED'}
+                    onChange={(e) => setEditingTestimonial({ ...editingTestimonial, status: e.target.value })}
+                    className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                  >
+                    <option value="PUBLISHED">Published</option>
+                    <option value="DRAFT">Draft</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 mb-1 font-semibold uppercase tracking-wider text-[10px]">
+                  Avatar Image URL (optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://images.unsplash.com/photo-..."
+                  value={editingTestimonial.avatar || ''}
+                  onChange={(e) => setEditingTestimonial({ ...editingTestimonial, avatar: e.target.value })}
+                  className="w-full bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-cream-100 focus:outline-none focus:border-gold-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="testimonialFeatured"
+                  checked={Boolean(editingTestimonial.featured)}
+                  onChange={(e) => setEditingTestimonial({ ...editingTestimonial, featured: e.target.checked })}
+                  className="rounded border-white/20 text-gold-500 focus:ring-0 cursor-pointer"
+                />
+                <label htmlFor="testimonialFeatured" className="text-slate-300 text-xs cursor-pointer">
+                  Feature prominently on homepage
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-white/10 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsTestimonialModalOpen(false);
+                    setEditingTestimonial(null);
+                  }}
+                  className="px-4 py-2 rounded-full bg-obsidian-900 border border-white/10 text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold uppercase tracking-wider text-[11px]"
+                >
+                  {editingTestimonial.id ? 'Save Changes' : 'Add Review'}
                 </button>
               </div>
             </form>

@@ -46,6 +46,11 @@ export async function GET() {
     }
 
     return NextResponse.json({
+      mediaCount: totalMedia,
+      projectsCount: totalProjects,
+      servicesCount: totalServices,
+      pendingInquiriesCount: pendingEnquiries,
+      storageSizeFormatted: (totalBytes / (1024 * 1024)).toFixed(2) + ' MB',
       metrics: {
         totalMedia,
         storageBytes: totalBytes,

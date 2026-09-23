@@ -1,18 +1,30 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { CATEGORIES, INITIAL_PROJECTS, ProjectData } from '@/lib/data';
 import { ProjectCard } from '@/components/project-card';
 import { Lightbox } from '@/components/lightbox';
 import { Filter, Film, Camera, Sparkles } from 'lucide-react';
 
 export default function PortfolioPage() {
+  const [projects, setProjects] = useState<ProjectData[]>(INITIAL_PROJECTS);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [filterType, setFilterType] = useState<'all' | 'video' | 'photo'>('all');
   const [activeVideoProject, setActiveVideoProject] = useState<ProjectData | null>(null);
 
+  useEffect(() => {
+    fetch('/api/projects')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.projects && Array.isArray(data.projects) && data.projects.length > 0) {
+          setProjects(data.projects);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const filteredProjects = useMemo(() => {
-    return INITIAL_PROJECTS.filter((project) => {
+    return projects.filter((project) => {
       const matchesCategory =
         selectedCategory === 'All' || project.category.toLowerCase() === selectedCategory.toLowerCase();
       const matchesType =
@@ -21,7 +33,7 @@ export default function PortfolioPage() {
         (filterType === 'photo' && !project.isVideo);
       return matchesCategory && matchesType;
     });
-  }, [selectedCategory, filterType]);
+  }, [projects, selectedCategory, filterType]);
 
   return (
     <div className="pt-28 sm:pt-32 pb-24 space-y-12 sm:space-y-16">
