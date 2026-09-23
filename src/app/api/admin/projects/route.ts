@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { recordAuditLog, recordContentRevision } from '@/lib/audit';
+import { getStoreProjects, addStoreProject } from '@/lib/store';
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,25 +12,39 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status') || '';
     const search = searchParams.get('q') || '';
 
-    const where: any = { isDeleted: false };
-    if (category && category !== 'ALL') where.category = category;
-    if (status && status !== 'ALL') where.status = status;
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { client: { contains: search, mode: 'insensitive' } },
-        { location: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-      ];
+    let projects: any[] = [];
+
+    try {
+      const where: any = { isDeleted: false };
+      if (category && category !== 'ALL') where.category = category;
+      if (status && status !== 'ALL') where.status = status;
+      if (search) {
+        where.OR = [
+          { title: { contains: search, mode: 'insensitive' } },
+          { client: { contains: search, mode: 'insensitive' } },
+          { location: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+
+      const dbProjects = await prisma.project.findMany({
+        where,
+        orderBy: [{ order: 'asc' }, { year: 'desc' }, { createdAt: 'desc' }],
+        include: {
+          _count: { select: { mediaItems: true } },
+        },
+      });
+
+      if (dbProjects.length > 0) {
+        projects = dbProjects;
+      }
+    } catch (dbErr) {
+      console.warn('Prisma projects fetch fallback to store:', dbErr);
     }
 
-    const projects = await prisma.project.findMany({
-      where,
-      orderBy: [{ order: 'asc' }, { year: 'desc' }, { createdAt: 'desc' }],
-      include: {
-        _count: { select: { mediaItems: true } },
-      },
-    });
+    if (projects.length === 0) {
+      projects = getStoreProjects({ category, status, search });
+    }
 
     return NextResponse.json({ projects });
   } catch (error: any) {
@@ -79,44 +94,72 @@ export async function POST(req: NextRequest) {
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '') + `-${Date.now().toString().slice(-4)}`;
 
-    const project = await prisma.project.create({
-      data: {
-        title,
-        slug: autoSlug,
-        category,
-        description: description || '',
-        client: client || null,
-        year: year ? parseInt(year) : new Date().getFullYear(),
-        location: location || 'Worldwide',
-        coverImage,
-        videoUrl: videoUrl || null,
-        duration: duration || null,
-        isVideo: Boolean(isVideo),
-        featured: Boolean(featured),
-        status: status || 'PUBLISHED',
-        order: order !== undefined ? parseInt(order) : 0,
-        gallery: Array.isArray(gallery) ? gallery : [],
-        deliverables: Array.isArray(deliverables) ? deliverables : [],
-        gearUsed: Array.isArray(gearUsed) ? gearUsed : [],
-      },
+    // Always create in store
+    const storeProject = addStoreProject({
+      title,
+      slug: autoSlug,
+      category,
+      description: description || '',
+      client: client || '',
+      year: year ? parseInt(year) : new Date().getFullYear(),
+      location: location || 'Worldwide',
+      coverImage,
+      videoUrl: videoUrl || '',
+      duration: duration || '',
+      isVideo: Boolean(isVideo),
+      featured: Boolean(featured),
+      status: status || 'PUBLISHED',
+      order: order !== undefined ? parseInt(order) : 0,
+      gallery: Array.isArray(gallery) ? gallery : [coverImage],
+      deliverables: Array.isArray(deliverables) ? deliverables : [],
+      gearUsed: Array.isArray(gearUsed) ? gearUsed : [],
     });
 
-    await recordAuditLog({
-      action: 'CREATE',
-      entityType: 'Project',
-      entityId: project.id,
-      entityTitle: project.title,
-      afterValues: project,
-      actor: session,
-    });
+    let project = storeProject;
 
-    await recordContentRevision({
-      entityType: 'Project',
-      entityId: project.id,
-      snapshot: project,
-      changeReason: 'Initial project creation',
-      actor: session,
-    });
+    try {
+      const dbProject = await prisma.project.create({
+        data: {
+          title,
+          slug: autoSlug,
+          category,
+          description: description || '',
+          client: client || null,
+          year: year ? parseInt(year) : new Date().getFullYear(),
+          location: location || 'Worldwide',
+          coverImage,
+          videoUrl: videoUrl || null,
+          duration: duration || null,
+          isVideo: Boolean(isVideo),
+          featured: Boolean(featured),
+          status: status || 'PUBLISHED',
+          order: order !== undefined ? parseInt(order) : 0,
+          gallery: Array.isArray(gallery) ? gallery : [],
+          deliverables: Array.isArray(deliverables) ? deliverables : [],
+          gearUsed: Array.isArray(gearUsed) ? gearUsed : [],
+        },
+      });
+      project = dbProject as any;
+
+      await recordAuditLog({
+        action: 'CREATE',
+        entityType: 'Project',
+        entityId: project.id,
+        entityTitle: project.title,
+        afterValues: project,
+        actor: session,
+      });
+
+      await recordContentRevision({
+        entityType: 'Project',
+        entityId: project.id,
+        snapshot: project,
+        changeReason: 'Initial project creation',
+        actor: session,
+      });
+    } catch (dbErr) {
+      console.warn('Prisma project create fallback to store:', dbErr);
+    }
 
     return NextResponse.json({ success: true, project });
   } catch (error: any) {

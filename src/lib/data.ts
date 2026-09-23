@@ -500,7 +500,12 @@ export async function getProjects(): Promise<ProjectData[]> {
   } catch (err) {
     // Database connection or table not ready, fallback gracefully
   }
-  return INITIAL_PROJECTS;
+  try {
+    const { getStoreProjects } = require('./store');
+    return getStoreProjects({ status: 'PUBLISHED' }) as unknown as ProjectData[];
+  } catch {
+    return INITIAL_PROJECTS;
+  }
 }
 
 export async function getProjectBySlug(slug: string): Promise<ProjectData | null> {
@@ -536,7 +541,12 @@ export async function getServices(): Promise<ServiceData[]> {
   } catch (err) {
     // Fallback
   }
-  return SERVICES;
+  try {
+    const { getStoreServices } = require('./store');
+    return getStoreServices().filter((s: any) => s.status === 'PUBLISHED') as unknown as ServiceData[];
+  } catch {
+    return SERVICES;
+  }
 }
 
 export async function getTestimonials(): Promise<TestimonialData[]> {
@@ -552,7 +562,12 @@ export async function getTestimonials(): Promise<TestimonialData[]> {
   } catch (err) {
     // Fallback
   }
-  return TESTIMONIALS;
+  try {
+    const { getStoreTestimonials } = require('./store');
+    return getStoreTestimonials().filter((t: any) => t.status === 'PUBLISHED') as unknown as TestimonialData[];
+  } catch {
+    return TESTIMONIALS;
+  }
 }
 
 export async function getTeamMembers(): Promise<TeamMemberData[]> {
@@ -644,9 +659,14 @@ export async function getSiteSettings(): Promise<Record<string, any>> {
       return normalizeSettings(rawMap, defaults);
     }
   } catch (err) {
-    // Fallback to defaults
+    // Fallback to store
   }
-  return defaults;
+  try {
+    const { getStoreSettings } = require('./store');
+    return getStoreSettings();
+  } catch {
+    return defaults;
+  }
 }
 
 

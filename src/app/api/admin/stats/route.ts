@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { isCloudStorageConfigured } from '@/lib/storage';
+import {
+  getStoreMedia,
+  getStoreProjects,
+  getStoreServices,
+  getStoreTrash,
+  getStoreAuditLogs,
+} from '@/lib/store';
 
 export async function GET() {
   try {
@@ -14,6 +21,7 @@ export async function GET() {
     let pendingEnquiries = 0;
     let trashCount = 0;
     let recentAudits: any[] = [];
+    let hasDbStats = false;
 
     try {
       const [mediaCount, mediaSizeAgg, projectsCount, servicesCount, enquiriesCount, trashMedia, trashProj, audits] =
@@ -41,8 +49,19 @@ export async function GET() {
       pendingEnquiries = enquiriesCount;
       trashCount = trashMedia + trashProj;
       recentAudits = audits;
+      hasDbStats = true;
     } catch (dbErr) {
-      console.warn('Stats database fetch fallback:', dbErr);
+      console.warn('Stats database fetch fallback to store:', dbErr);
+    }
+
+    if (!hasDbStats || totalMedia === 0) {
+      const storeMedia = getStoreMedia();
+      totalMedia = storeMedia.length;
+      totalBytes = storeMedia.reduce((acc, m) => acc + (m.sizeBytes || 0), 0);
+      totalProjects = getStoreProjects().length;
+      totalServices = getStoreServices().length;
+      trashCount = getStoreTrash().length;
+      recentAudits = getStoreAuditLogs().slice(0, 8);
     }
 
     return NextResponse.json({

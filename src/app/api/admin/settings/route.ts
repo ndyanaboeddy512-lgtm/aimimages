@@ -3,32 +3,22 @@ import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { recordAuditLog, recordSettingRevision } from '@/lib/audit';
 import { normalizeSettings } from '@/lib/data';
+import { getStoreSettings, setStoreSetting } from '@/lib/store';
 
 export async function GET() {
   try {
     await requireAuth();
 
-    const settings = await prisma.siteSetting.findMany({
-      orderBy: { category: 'asc' },
-    });
+    let settings: any[] = [];
+    try {
+      settings = await prisma.siteSetting.findMany({
+        orderBy: { category: 'asc' },
+      });
+    } catch (dbErr) {
+      console.warn('Prisma siteSetting fetch failed, using store fallback:', dbErr);
+    }
 
-    const defaults: Record<string, any> = {
-      brand_name: 'Aim Images HD',
-      brand_tagline: 'Where Light Meets Timeless Storytelling',
-      hero_headline: 'Where Light Meets Timeless Storytelling',
-      hero_subheadline: 'Aim Images HD crafts breathtaking wedding documentaries, high-fashion editorial campaigns, and cinematic commercial films across the globe.',
-      booking_status: 'Bookings Open',
-      contact_phone: '+256 764 709 563',
-      contact_whatsapp: '+256 764 709 563',
-      contact_email: 'aimugimages@gmail.com',
-      studio_address: 'Rugarama Road, Kabale, Uganda',
-      google_maps_url: 'https://maps.google.com/?q=Rugarama+Road,+Kabale,+Uganda',
-      instagram_url: 'https://instagram.com/aimimages',
-      youtube_url: 'https://youtube.com/@aimimages',
-      vimeo_url: 'https://vimeo.com/aimimages',
-      seo_title: 'Aim Images HD | Luxury Wedding Cinema & Haute Couture Photography',
-      seo_description: 'Aim Images HD is an internationally recognized visual media studio based in Kabale, Uganda, crafting high-end wedding documentaries and editorial campaigns worldwide.',
-    };
+    const defaults = getStoreSettings();
 
     const rawMap: Record<string, any> = {};
     for (const s of settings) {
@@ -55,45 +45,55 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Key and value are required.' }, { status: 400 });
     }
 
-    const existing = await prisma.siteSetting.findUnique({ where: { key } });
+    // Always update store so fallback remains in sync
+    setStoreSetting(key, value, label, changeReason, session);
 
-    const updated = await prisma.siteSetting.upsert({
-      where: { key },
-      update: {
+    let updated: any = { key, value, label, description };
+
+    try {
+      const existing = await prisma.siteSetting.findUnique({ where: { key } });
+      const safeUserId = session.id !== 'superadmin-fallback' ? session.id : null;
+
+      updated = await prisma.siteSetting.upsert({
+        where: { key },
+        update: {
+          value,
+          label: label !== undefined ? label : existing?.label,
+          description: description !== undefined ? description : existing?.description,
+          updatedById: safeUserId,
+        },
+        create: {
+          key,
+          category: category || 'GENERAL',
+          label: label || key,
+          description: description || '',
+          value,
+          updatedById: safeUserId,
+        },
+      });
+
+      // Save snapshot revision
+      await recordSettingRevision({
+        settingId: updated.id,
         value,
-        label: label !== undefined ? label : existing?.label,
-        description: description !== undefined ? description : existing?.description,
-        updatedById: session.id,
-      },
-      create: {
-        key,
-        category: category || 'GENERAL',
-        label: label || key,
-        description: description || '',
-        value,
-        updatedById: session.id,
-      },
-    });
+        changeReason: changeReason || 'Updated in admin dashboard',
+        actor: session,
+      });
 
-    // Save snapshot revision
-    await recordSettingRevision({
-      settingId: updated.id,
-      value,
-      changeReason: changeReason || 'Updated in admin dashboard',
-      actor: session,
-    });
-
-    // Record audit log
-    await recordAuditLog({
-      action: 'SETTINGS_CHANGE',
-      entityType: 'SiteSetting',
-      entityId: updated.id,
-      entityTitle: updated.label || updated.key,
-      beforeValues: existing?.value,
-      afterValues: updated.value,
-      actor: session,
-      metadata: { key: updated.key, category: updated.category },
-    });
+      // Record audit log
+      await recordAuditLog({
+        action: 'SETTINGS_CHANGE',
+        entityType: 'SiteSetting',
+        entityId: updated.id,
+        entityTitle: updated.label || updated.key,
+        beforeValues: existing?.value,
+        afterValues: updated.value,
+        actor: session,
+        metadata: { key: updated.key, category: updated.category },
+      });
+    } catch (dbErr) {
+      console.warn('Prisma siteSetting upsert failed, stored in resilient store:', dbErr);
+    }
 
     return NextResponse.json({ success: true, setting: updated });
   } catch (error: any) {

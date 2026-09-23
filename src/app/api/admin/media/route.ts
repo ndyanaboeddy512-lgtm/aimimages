@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { processAndStoreFile } from '@/lib/storage';
 import { recordAuditLog } from '@/lib/audit';
+import { getStoreMedia, addStoreMedia } from '@/lib/store';
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,52 +19,54 @@ export async function GET(req: NextRequest) {
     const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '24')));
     const skip = (page - 1) * limit;
 
-    const where: any = {
-      isDeleted: false,
-    };
+    let items: any[] = [];
+    let total = 0;
 
-    if (category && category !== 'ALL') {
-      where.category = category;
-    }
+    try {
+      const where: any = { isDeleted: false };
+      if (category && category !== 'ALL') where.category = category;
+      if (type === 'image' || type === 'photo') where.isVideo = false;
+      else if (type === 'video') where.isVideo = true;
+      if (status && status !== 'ALL') where.status = status;
+      if (projectId) where.projectId = projectId;
+      if (search) {
+        where.OR = [
+          { title: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { location: { contains: search, mode: 'insensitive' } },
+          { filename: { contains: search, mode: 'insensitive' } },
+          { tags: { hasSome: [search] } },
+        ];
+      }
 
-    if (type === 'image' || type === 'photo') {
-      where.isVideo = false;
-    } else if (type === 'video') {
-      where.isVideo = true;
-    }
-
-    if (status && status !== 'ALL') {
-      where.status = status;
-    }
-
-    if (projectId) {
-      where.projectId = projectId;
-    }
-
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { location: { contains: search, mode: 'insensitive' } },
-        { filename: { contains: search, mode: 'insensitive' } },
-        { tags: { hasSome: [search] } },
-      ];
-    }
-
-    const [items, total] = await Promise.all([
-      prisma.mediaItem.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
-        include: {
-          project: {
-            select: { id: true, title: true, slug: true },
+      const [dbItems, dbTotal] = await Promise.all([
+        prisma.mediaItem.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+          include: {
+            project: {
+              select: { id: true, title: true, slug: true },
+            },
           },
-        },
-      }),
-      prisma.mediaItem.count({ where }),
-    ]);
+        }),
+        prisma.mediaItem.count({ where }),
+      ]);
+
+      if (dbItems.length > 0 || dbTotal > 0) {
+        items = dbItems;
+        total = dbTotal;
+      }
+    } catch (dbErr) {
+      console.warn('Prisma media fetch fallback to store:', dbErr);
+    }
+
+    if (items.length === 0) {
+      const allStoreItems = getStoreMedia({ search, category, type, status });
+      total = allStoreItems.length;
+      items = allStoreItems.slice(skip, skip + limit);
+    }
 
     return NextResponse.json({
       items,
@@ -71,7 +74,7 @@ export async function GET(req: NextRequest) {
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.max(1, Math.ceil(total / limit)),
     });
   } catch (error: any) {
     if (error.message === 'UNAUTHORIZED') {
@@ -117,32 +120,66 @@ export async function POST(req: NextRequest) {
       ? tagsRaw.split(',').map((t) => t.trim()).filter(Boolean)
       : [];
 
-    const mediaItem = await prisma.mediaItem.create({
-      data: {
-        url: stored.url,
-        storageKey: stored.storageKey,
-        storageBucket: stored.storageBucket,
-        storageProvider: stored.storageProvider,
-        filename: stored.filename,
-        originalName: stored.originalName,
-        mimeType: stored.mimeType,
-        sizeBytes: stored.sizeBytes,
-        width: stored.width,
-        height: stored.height,
-        isVideo: stored.isVideo,
-        posterUrl: stored.posterUrl,
-        title,
-        description,
-        category,
-        tags,
-        projectId: projectId && projectId !== 'none' ? projectId : null,
-        altText,
-        location,
-        featured,
-        status,
-        uploadedById: session.id,
-      },
+    // Always create in store
+    const storeItem = addStoreMedia({
+      url: stored.url,
+      storageKey: stored.storageKey,
+      storageBucket: stored.storageBucket,
+      storageProvider: stored.storageProvider,
+      filename: stored.filename,
+      originalName: stored.originalName,
+      mimeType: stored.mimeType,
+      sizeBytes: stored.sizeBytes,
+      width: stored.width,
+      height: stored.height,
+      isVideo: stored.isVideo,
+      posterUrl: stored.posterUrl,
+      title,
+      description,
+      category,
+      tags,
+      projectId: projectId && projectId !== 'none' ? projectId : null,
+      altText,
+      location,
+      featured,
+      status,
+      order: 0,
+      uploadedById: session.id !== 'superadmin-fallback' ? session.id : null,
     });
+
+    let mediaItem = storeItem;
+
+    try {
+      const dbItem = await prisma.mediaItem.create({
+        data: {
+          url: stored.url,
+          storageKey: stored.storageKey,
+          storageBucket: stored.storageBucket,
+          storageProvider: stored.storageProvider,
+          filename: stored.filename,
+          originalName: stored.originalName,
+          mimeType: stored.mimeType,
+          sizeBytes: stored.sizeBytes,
+          width: stored.width,
+          height: stored.height,
+          isVideo: stored.isVideo,
+          posterUrl: stored.posterUrl,
+          title,
+          description,
+          category,
+          tags,
+          projectId: projectId && projectId !== 'none' ? projectId : null,
+          altText,
+          location,
+          featured,
+          status,
+          uploadedById: session.id !== 'superadmin-fallback' ? session.id : null,
+        },
+      });
+      mediaItem = dbItem as any;
+    } catch (dbErr) {
+      console.warn('Prisma media creation fallback to store:', dbErr);
+    }
 
     await recordAuditLog({
       action: 'CREATE',

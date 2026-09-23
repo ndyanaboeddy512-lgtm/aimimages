@@ -45,7 +45,7 @@ export async function recordAuditLog(input: AuditLogInput): Promise<void> {
         beforeValues: input.beforeValues ? JSON.parse(JSON.stringify(input.beforeValues)) : undefined,
         afterValues: input.afterValues ? JSON.parse(JSON.stringify(input.afterValues)) : undefined,
         metadata: input.metadata ? JSON.parse(JSON.stringify(input.metadata)) : undefined,
-        userId: actor?.id || null,
+        userId: actor?.id && actor.id !== 'superadmin-fallback' ? actor.id : null,
         userName: actor?.name || 'System / Anonymous',
         userEmail: actor?.email || null,
         userRole: actor?.role || null,
@@ -81,7 +81,7 @@ export async function recordContentRevision(params: {
         version: count + 1,
         snapshot: JSON.parse(JSON.stringify(params.snapshot)),
         changeReason: params.changeReason || 'Updated content',
-        createdById: actor?.id || null,
+        createdById: actor?.id && actor.id !== 'superadmin-fallback' ? actor.id : null,
       },
     });
   } catch (err) {
@@ -108,7 +108,7 @@ export async function recordSettingRevision(params: {
         value: JSON.parse(JSON.stringify(params.value)),
         version: count + 1,
         changeReason: params.changeReason || 'Updated setting',
-        createdById: actor?.id || null,
+        createdById: actor?.id && actor.id !== 'superadmin-fallback' ? actor.id : null,
       },
     });
   } catch (err) {
