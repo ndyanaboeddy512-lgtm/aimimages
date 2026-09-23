@@ -12,6 +12,16 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [logo, setLogo] = useState('/logo.png');
+
+  React.useEffect(() => {
+    fetch('/api/admin/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settingsMap?.site_logo) setLogo(data.settingsMap.site_logo);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +63,7 @@ export default function AdminLoginPage() {
         <div className="text-center space-y-3">
           <div className="relative w-16 h-16 mx-auto mb-2 flex items-center justify-center">
             <Image
-              src="/logo.png"
+              src={logo}
               alt="Aim Images Studio"
               width={64}
               height={64}

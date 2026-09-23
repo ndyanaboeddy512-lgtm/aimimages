@@ -4,6 +4,9 @@ import '@/styles/globals.css';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { FloatingWhatsApp } from '@/components/whatsapp-fab';
+import { getSiteSettings } from '@/lib/data';
+
+export const dynamic = 'force-dynamic';
 
 const cinzel = Cinzel({
   subsets: ['latin'],
@@ -36,18 +39,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await getSiteSettings();
+
   return (
     <html lang="en" className={`${cinzel.variable} ${plusJakarta.variable}`}>
       <body className="font-sans antialiased bg-obsidian-950 text-cream-100 selection:bg-gold-500 selection:text-obsidian-950 flex flex-col min-h-screen">
-        <Navbar />
+        <Navbar settings={settings} />
         <main className="flex-1">{children}</main>
-        <Footer />
-        <FloatingWhatsApp />
+        <Footer settings={settings} />
+        <FloatingWhatsApp settings={settings} />
       </body>
     </html>
   );

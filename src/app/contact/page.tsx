@@ -8,6 +8,7 @@ export default async function ContactPage() {
   const studioAddress = settings.studio_address || 'Rugarama Road, Kabale, Uganda';
   const contactEmail = settings.contact_email || 'aimugimages@gmail.com';
   const contactWhatsApp = settings.contact_whatsapp || '+256 764 709 563';
+  const googleMapsUrl = settings.google_maps_url || 'https://maps.google.com/?q=Rugarama+Road,+Kabale,+Uganda';
   const waNumber = contactWhatsApp.replace(/[^0-9]/g, '');
 
   return (
@@ -41,7 +42,18 @@ export default async function ContactPage() {
                 <div>
                   <span className="block text-[11px] uppercase tracking-wider text-slate-500">Studio Location</span>
                   <span className="font-medium text-cream-100">{studioAddress}</span>
-                  <span className="block text-xs text-slate-400">Available throughout Uganda & Worldwide</span>
+                  <span className="block text-xs text-slate-400 mb-1">Available throughout Uganda & Worldwide</span>
+                  {googleMapsUrl && (
+                    <a
+                      href={googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-gold-400 hover:text-gold-300 font-medium inline-flex items-center gap-1 transition-colors"
+                    >
+                      <span>View on Google Maps / Directions</span>
+                      <Globe className="w-3 h-3 ml-0.5" />
+                    </a>
+                  )}
                 </div>
               </div>
 
@@ -85,7 +97,7 @@ export default async function ContactPage() {
 
             <div className="pt-4 border-t border-white/5">
               <a
-                href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20a%20production."
+                href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20a%20production.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full min-h-[48px] inline-flex items-center justify-center gap-2 py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider transition-colors shadow-lg"
@@ -109,7 +121,7 @@ export default async function ContactPage() {
 
         {/* Right Column: Multi-Step Booking Form */}
         <div className="lg:col-span-2 order-1 lg:order-2">
-          <BookingForm />
+          <BookingForm whatsappNumber={settings.contact_whatsapp} />
         </div>
       </div>
     </div>

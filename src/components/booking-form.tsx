@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Send, CheckCircle2, MessageSquare, AlertCircle } from 'lucide-react';
 
-export function BookingForm() {
+export function BookingForm({ whatsappNumber }: { whatsappNumber?: string } = {}) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -70,10 +70,11 @@ export function BookingForm() {
   };
 
   const createWhatsAppLink = () => {
+    const waNumber = (whatsappNumber || '256764709563').replace(/[^0-9]/g, '');
     const text = encodeURIComponent(
       `Hello Aim Images! I would like to inquire about booking a production:\n\n👤 Name: ${formData.name || 'Client'}\n📸 Service: ${formData.service}\n📅 Date: ${formData.eventDate || 'TBD'}\n💰 Budget: ${formData.budgetRange}\n📝 Note: ${formData.message || 'Looking forward to discussing details.'}`
     );
-    return `https://wa.me/256764709563?text=${text}`;
+    return `https://wa.me/${waNumber}?text=${text}`;
   };
 
   if (status === 'success') {

@@ -1,12 +1,16 @@
 import React from 'react';
 import Link from 'next/link';
-import { getServices, SERVICES, FAQS } from '@/lib/data';
+import { getServices, getSiteSettings, SERVICES, FAQS } from '@/lib/data';
 import { FAQAccordion } from '@/components/faq-accordion';
 import { CheckCircle2, ArrowRight, Sparkles, Clock, Compass, Shield, Award } from 'lucide-react';
 
 export default async function ServicesPage() {
-  const servicesData = await getServices();
+  const [servicesData, settings] = await Promise.all([
+    getServices(),
+    getSiteSettings(),
+  ]);
   const services = servicesData && servicesData.length > 0 ? servicesData : SERVICES;
+  const waNumber = (settings.contact_whatsapp || '256764709563').replace(/[^0-9]/g, '');
 
   const steps = [
     {
@@ -100,7 +104,7 @@ export default async function ServicesPage() {
 
             <div className="pt-6 border-t border-white/5">
               <a
-                href={`https://wa.me/256764709563?text=${encodeURIComponent(
+                href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
                   `Hello Aim Images, I would like to book the ${service.title} package.`
                 )}`}
                 target="_blank"
@@ -179,7 +183,7 @@ export default async function ServicesPage() {
           </p>
           <div className="pt-2">
             <a
-              href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20schedule%20a%20consultation%20for%20a%20bespoke%20production."
+              href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20schedule%20a%20consultation%20for%20a%20bespoke%20production.`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 text-xs uppercase font-bold tracking-widest transition-colors shadow-lg"

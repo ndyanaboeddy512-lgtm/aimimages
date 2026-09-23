@@ -134,6 +134,7 @@ interface AimStore {
 }
 
 const DEFAULT_SETTINGS: Record<string, any> = {
+  site_logo: '/logo.png',
   brand_name: 'Aim Images HD',
   brand_tagline: 'Where Light Meets Timeless Storytelling',
   hero_headline: 'Where Light Meets Timeless Storytelling',
@@ -145,8 +146,8 @@ const DEFAULT_SETTINGS: Record<string, any> = {
   contact_email: 'aimugimages@gmail.com',
   studio_address: 'Rugarama Road, Kabale, Uganda',
   google_maps_url: 'https://maps.google.com/?q=Rugarama+Road,+Kabale,+Uganda',
-  instagram_url: 'https://instagram.com/aimimages',
-  youtube_url: 'https://youtube.com/@aimimages',
+  instagram_url: 'https://instagram.com/aimimages_hd_photography',
+  youtube_url: 'https://youtube.com/@AimImagesphotography',
   vimeo_url: 'https://vimeo.com/aimimages',
   seo_title: 'Aim Images HD | Luxury Wedding Cinema & Haute Couture Photography',
   seo_description:

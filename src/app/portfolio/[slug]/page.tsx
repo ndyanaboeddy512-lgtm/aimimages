@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Calendar, MapPin, Film, CheckCircle2 } from 'lucide-react';
-import { getProjectBySlug, getProjects } from '@/lib/data';
+import { getProjectBySlug, getProjects, getSiteSettings } from '@/lib/data';
 
 export default async function ProjectDetailPage({
   params,
@@ -17,7 +17,11 @@ export default async function ProjectDetailPage({
     notFound();
   }
 
-  const allProjects = await getProjects();
+  const [allProjects, settings] = await Promise.all([
+    getProjects(),
+    getSiteSettings(),
+  ]);
+  const waNumber = (settings.contact_whatsapp || '256764709563').replace(/[^0-9]/g, '');
   const currentIndex = allProjects.findIndex((p) => p.slug === slug);
   const prevProject = currentIndex > 0 ? allProjects[currentIndex - 1] : null;
   const nextProject = currentIndex < allProjects.length - 1 ? allProjects[currentIndex + 1] : null;
@@ -144,7 +148,7 @@ export default async function ProjectDetailPage({
 
           <div className="pt-4 border-t border-white/5">
             <a
-              href={`https://wa.me/256764709563?text=${encodeURIComponent(
+              href={`https://wa.me/${waNumber}?text=${encodeURIComponent(
                 `Hello Aim Images, I am interested in inquiring about a project similar to ${project.title}.`
               )}`}
               target="_blank"

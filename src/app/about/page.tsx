@@ -1,12 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getTeamMembers, TEAM_MEMBERS, STATS, BTS_IMAGES } from '@/lib/data';
+import { getTeamMembers, getSiteSettings, TEAM_MEMBERS, STATS, BTS_IMAGES } from '@/lib/data';
 import { Sparkles, Camera, Film, Award, Heart, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default async function AboutPage() {
-  const teamMembersData = await getTeamMembers();
+  const [teamMembersData, settings] = await Promise.all([
+    getTeamMembers(),
+    getSiteSettings(),
+  ]);
   const teamMembers = teamMembersData && teamMembersData.length > 0 ? teamMembersData : TEAM_MEMBERS;
+  const waNumber = (settings.contact_whatsapp || '256764709563').replace(/[^0-9]/g, '');
   const values = [
     {
       title: 'Emotive Realism',
@@ -191,7 +195,7 @@ export default async function AboutPage() {
           </p>
           <div className="pt-2">
             <a
-              href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20collaborate%20on%20a%20production."
+              href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20collaborate%20on%20a%20production.`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gold-500 hover:bg-gold-400 text-obsidian-950 font-bold text-xs uppercase tracking-widest transition-colors shadow-lg"

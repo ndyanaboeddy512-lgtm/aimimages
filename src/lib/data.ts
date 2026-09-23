@@ -594,6 +594,9 @@ export function normalizeSettings(rawMap: Record<string, any>, defaults: Record<
   }
 
   if (rawMap.site_identity && typeof rawMap.site_identity === 'object') {
+    if (!rawMap.site_logo && (rawMap.site_identity.logoUrl || rawMap.site_identity.logo)) {
+      result.site_logo = rawMap.site_identity.logoUrl || rawMap.site_identity.logo;
+    }
     if (!rawMap.brand_name && rawMap.site_identity.studioName) result.brand_name = rawMap.site_identity.studioName;
     if (!rawMap.brand_tagline && rawMap.site_identity.tagline) result.brand_tagline = rawMap.site_identity.tagline;
     if (!rawMap.hero_headline && rawMap.site_identity.heroHeadline) result.hero_headline = rawMap.site_identity.heroHeadline;
@@ -632,6 +635,7 @@ export function normalizeSettings(rawMap: Record<string, any>, defaults: Record<
 
 export async function getSiteSettings(): Promise<Record<string, any>> {
   const defaults: Record<string, any> = {
+    site_logo: '/logo.png',
     brand_name: 'Aim Images HD',
     brand_tagline: 'Where Light Meets Timeless Storytelling',
     hero_headline: 'Where Light Meets Timeless Storytelling',
@@ -642,8 +646,8 @@ export async function getSiteSettings(): Promise<Record<string, any>> {
     contact_email: 'aimugimages@gmail.com',
     studio_address: 'Rugarama Road, Kabale, Uganda',
     google_maps_url: 'https://maps.google.com/?q=Rugarama+Road,+Kabale,+Uganda',
-    instagram_url: 'https://instagram.com/aimimages',
-    youtube_url: 'https://youtube.com/@aimimages',
+    instagram_url: 'https://instagram.com/aimimages_hd_photography',
+    youtube_url: 'https://youtube.com/@AimImagesphotography',
     vimeo_url: 'https://vimeo.com/aimimages',
     seo_title: 'Aim Images HD | Luxury Wedding Cinema & Haute Couture Photography',
     seo_description: 'Aim Images HD is an internationally recognized visual media studio based in Kabale, Uganda, crafting high-end wedding documentaries and editorial campaigns worldwide.',

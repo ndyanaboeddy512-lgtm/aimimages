@@ -148,6 +148,7 @@ export default function AdminDashboardPage() {
 
   // Settings & Revisions State
   const [settings, setSettings] = useState<Record<string, any>>({
+    site_logo: '/logo.png',
     brand_name: 'Aim Images HD',
     brand_tagline: 'Where Light Meets Timeless Storytelling',
     booking_status: 'Bookings Open',
@@ -156,8 +157,8 @@ export default function AdminDashboardPage() {
     contact_email: 'aimugimages@gmail.com',
     studio_address: 'Rugarama Road, Kabale, Uganda',
     google_maps_url: 'https://maps.google.com/?q=Rugarama+Road,+Kabale,+Uganda',
-    instagram_url: 'https://instagram.com/aimimages',
-    youtube_url: 'https://youtube.com/@aimimages',
+    instagram_url: 'https://instagram.com/aimimages_hd_photography',
+    youtube_url: 'https://youtube.com/@AimImagesphotography',
     vimeo_url: 'https://vimeo.com/aimimages',
     seo_title: 'Aim Images HD | Luxury Wedding Cinema & Haute Couture Photography',
     seo_description: 'Aim Images HD is an internationally recognized visual media studio based in Kabale, Uganda, crafting high-end wedding documentaries and editorial campaigns worldwide.',
@@ -1820,6 +1821,46 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div className="space-y-4">
+                    {/* Studio Logo */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs uppercase tracking-wider text-slate-400 font-semibold">
+                          Studio Logo
+                        </label>
+                        <button
+                          onClick={() => fetchRevisions('site_logo')}
+                          className="text-[11px] text-gold-400 hover:text-gold-300 flex items-center gap-1 font-semibold"
+                        >
+                          <History className="w-3 h-3" />
+                          <span>Revisions</span>
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-3 p-2.5 rounded-xl bg-obsidian-900 border border-white/5 mb-2">
+                        <div className="w-20 h-10 relative flex items-center justify-center bg-black/60 rounded-lg p-1 border border-white/10 shrink-0">
+                          <Image
+                            src={settings.site_logo || '/logo.png'}
+                            alt="Studio Logo Preview"
+                            width={80}
+                            height={40}
+                            className="max-h-8 w-auto object-contain"
+                          />
+                        </div>
+                        <input
+                          type="text"
+                          placeholder="/logo.png or image URL"
+                          value={settings.site_logo || ''}
+                          onChange={(e) => setSettings({ ...settings, site_logo: e.target.value })}
+                          className="flex-1 bg-obsidian-950 border border-white/10 rounded-xl px-3 py-2 text-xs text-cream-100 focus:outline-none focus:border-gold-500"
+                        />
+                        <button
+                          onClick={() => handleSaveSetting('site_logo', settings.site_logo || '/logo.png', 'Studio Logo')}
+                          className="px-3 py-2 rounded-xl bg-gold-500 text-obsidian-950 font-bold text-xs hover:bg-gold-400 shrink-0"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+
                     <div>
                       <label className="block text-xs uppercase tracking-wider text-slate-400 mb-1 font-semibold">
                         Studio Brand Name
@@ -1973,6 +2014,64 @@ export default function AdminDashboardPage() {
                         <button
                           onClick={() => handleSaveSetting('google_maps_url', settings.google_maps_url, 'Google Maps URL')}
                           className="px-3 py-2 rounded-xl bg-gold-500 text-obsidian-950 font-bold text-xs hover:bg-gold-400"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Social Links & Profiles */}
+                <div className="md:col-span-2 p-6 rounded-2xl bg-obsidian-850 border border-white/10 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-serif text-lg font-bold text-cream-50">Social Links & Profiles</h3>
+                    <button
+                      onClick={() => fetchRevisions('instagram_url')}
+                      className="text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1 font-semibold"
+                    >
+                      <History className="w-3.5 h-3.5" />
+                      <span>View Revisions</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-slate-400 mb-1 font-semibold">
+                        Instagram Profile URL
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={settings.instagram_url || ''}
+                          onChange={(e) => setSettings({ ...settings, instagram_url: e.target.value })}
+                          placeholder="https://instagram.com/aimimages_hd_photography"
+                          className="flex-1 bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-cream-100 focus:outline-none focus:border-gold-500"
+                        />
+                        <button
+                          onClick={() => handleSaveSetting('instagram_url', settings.instagram_url, 'Instagram URL')}
+                          className="px-3 py-2 rounded-xl bg-gold-500 text-obsidian-950 font-bold text-xs hover:bg-gold-400 shrink-0"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs uppercase tracking-wider text-slate-400 mb-1 font-semibold">
+                        YouTube Channel URL
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={settings.youtube_url || ''}
+                          onChange={(e) => setSettings({ ...settings, youtube_url: e.target.value })}
+                          placeholder="https://youtube.com/@AimImagesphotography"
+                          className="flex-1 bg-obsidian-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-cream-100 focus:outline-none focus:border-gold-500"
+                        />
+                        <button
+                          onClick={() => handleSaveSetting('youtube_url', settings.youtube_url, 'YouTube URL')}
+                          className="px-3 py-2 rounded-xl bg-gold-500 text-obsidian-950 font-bold text-xs hover:bg-gold-400 shrink-0"
                         >
                           Save
                         </button>

@@ -1,14 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, Phone, Instagram, Youtube, CheckCircle2, ArrowRight } from 'lucide-react';
 
-export function Footer() {
+export function Footer({ settings: initialSettings }: { settings?: Record<string, any> } = {}) {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState<Record<string, any>>(initialSettings || {});
+
+  useEffect(() => {
+    if (initialSettings) setSettings(initialSettings);
+    fetch('/api/admin/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settingsMap) setSettings((prev) => ({ ...prev, ...data.settingsMap }));
+      })
+      .catch(() => {});
+  }, [initialSettings]);
+
+  const siteLogo = settings.site_logo || '/logo.png';
+  const instagramUrl = settings.instagram_url || 'https://instagram.com/aimimages_hd_photography';
+  const youtubeUrl = settings.youtube_url || 'https://youtube.com/@AimImagesphotography';
+  const contactEmail = settings.contact_email || 'aimugimages@gmail.com';
+  const contactWhatsApp = settings.contact_whatsapp || '+256 764 709 563';
+  const waNumber = contactWhatsApp.replace(/[^0-9]/g, '');
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +56,7 @@ export function Footer() {
         <div className="sm:col-span-2 space-y-6">
           <Link href="/" className="inline-block" aria-label="Aim Images Home">
             <Image
-              src="/logo.png"
+              src={siteLogo}
               alt="Aim Images Studio Logo"
               width={180}
               height={104}
@@ -50,7 +68,7 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-3 text-slate-400">
             <a
-              href="https://instagram.com/aimimages_hd_photography"
+              href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow Aim Images on Instagram"
@@ -59,7 +77,7 @@ export function Footer() {
               <Instagram className="w-4 h-4" />
             </a>
             <a
-              href="https://youtube.com/@AimImagesphotography"
+              href={youtubeUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Subscribe to Aim Images on YouTube"
@@ -68,7 +86,7 @@ export function Footer() {
               <Youtube className="w-4 h-4" />
             </a>
             <a
-              href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20your%20services."
+              href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20your%20services.`}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Chat with Aim Images on WhatsApp"
@@ -77,7 +95,7 @@ export function Footer() {
               <Phone className="w-4 h-4" />
             </a>
             <a
-              href="mailto:aimugimages@gmail.com"
+              href={`mailto:${contactEmail}`}
               aria-label="Email Aim Images Studio"
               className="min-w-[44px] min-h-[44px] rounded-full border border-white/10 flex items-center justify-center hover:text-gold-400 hover:border-gold-500/40 transition-colors"
             >
@@ -108,7 +126,7 @@ export function Footer() {
             </li>
             <li>
               <a
-                href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production."
+                href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block py-1.5 hover:text-gold-400 transition-colors"
@@ -197,9 +215,23 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4 text-center sm:text-left">
         <p>© {new Date().getFullYear()} Aim Images HD Studio. All rights reserved.</p>
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-          <span>Rugarama Road, Kabale, Uganda</span>
+          <a
+            href={settings.google_maps_url || 'https://maps.google.com/?q=Rugarama+Road,+Kabale,+Uganda'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-gold-400 transition-colors"
+          >
+            {settings.studio_address || 'Rugarama Road, Kabale, Uganda'}
+          </a>
           <span>•</span>
-          <span>+256 764 709 563</span>
+          <a
+            href={`https://wa.me/${waNumber}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-emerald-400 transition-colors"
+          >
+            {settings.contact_phone || settings.contact_whatsapp || '+256 764 709 563'}
+          </a>
           <span>•</span>
           <span>Worldwide Commissions</span>
         </div>

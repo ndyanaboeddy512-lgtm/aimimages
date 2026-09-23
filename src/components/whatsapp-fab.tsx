@@ -1,10 +1,22 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-export function FloatingWhatsApp() {
-  const whatsappUrl =
-    'https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20your%20photography%20and%20cinema%20services.';
+export function FloatingWhatsApp({ settings: initialSettings }: { settings?: Record<string, any> } = {}) {
+  const [settings, setSettings] = useState<Record<string, any>>(initialSettings || {});
+
+  useEffect(() => {
+    if (initialSettings) setSettings(initialSettings);
+    fetch('/api/admin/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settingsMap) setSettings((prev) => ({ ...prev, ...data.settingsMap }));
+      })
+      .catch(() => {});
+  }, [initialSettings]);
+
+  const waNumber = (settings.contact_whatsapp || '256764709563').replace(/[^0-9]/g, '');
+  const whatsappUrl = `https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20your%20photography%20and%20cinema%20services.`;
 
   return (
     <aside

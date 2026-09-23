@@ -6,10 +6,24 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X, Phone, ArrowRight } from 'lucide-react';
 
-export function Navbar() {
+export function Navbar({ settings: initialSettings }: { settings?: Record<string, any> } = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const [settings, setSettings] = useState<Record<string, any>>(initialSettings || {});
+
+  useEffect(() => {
+    if (initialSettings) setSettings(initialSettings);
+    fetch('/api/admin/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.settingsMap) setSettings((prev) => ({ ...prev, ...data.settingsMap }));
+      })
+      .catch(() => {});
+  }, [initialSettings]);
+
+  const waNumber = (settings.contact_whatsapp || '256764709563').replace(/[^0-9]/g, '');
+  const bookingStatus = settings.booking_status || 'Bookings Open';
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -52,10 +66,10 @@ export function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-          {/* Brand Logo - Official Aim Images Logo */}
+          {/* Brand Logo - Dynamic Aim Images Logo */}
           <Link href="/" className="group flex items-center shrink-0" aria-label="Aim Images Home">
             <Image
-              src="/logo.png"
+              src={settings.site_logo || '/logo.png'}
               alt="Aim Images Studio Logo"
               width={160}
               height={92}
@@ -86,9 +100,14 @@ export function Navbar() {
           </nav>
 
           {/* Desktop Action CTA - Direct WhatsApp Booking */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3 lg:gap-4">
+            <span className="hidden xl:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium text-[11px] tracking-wide">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span>{bookingStatus}</span>
+            </span>
+
             <a
-              href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production."
+              href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production.`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gold-500/10 border border-gold-500/40 text-gold-400 hover:bg-gold-500 hover:text-obsidian-950 font-medium text-xs tracking-widest uppercase transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)]"
@@ -145,8 +164,13 @@ export function Navbar() {
           })}
 
           <div className="pt-4 mt-2 border-t border-white/10 flex flex-col gap-3">
+            <div className="flex items-center justify-center gap-1.5 py-1 px-3 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-medium text-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span>{bookingStatus}</span>
+            </div>
+
             <a
-              href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production."
+              href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20inquire%20about%20booking%20a%20production.`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
@@ -155,7 +179,7 @@ export function Navbar() {
               Inquire & Book on WhatsApp
             </a>
             <a
-              href="https://wa.me/256764709563?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20chat%20live%20about%20photography%20services."
+              href={`https://wa.me/${waNumber}?text=Hello%20Aim%20Images%2C%20I%20would%20like%20to%20chat%20live%20about%20photography%20services.`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-full border border-emerald-500/30 text-emerald-400 text-xs tracking-widest uppercase hover:bg-emerald-500/10 font-medium transition-colors"
