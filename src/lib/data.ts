@@ -662,10 +662,35 @@ export async function getSiteSettings(): Promise<Record<string, any>> {
       }
       return normalizeSettings(rawMap, defaults);
     }
-  } catch (err) {
-    // Fallback to store
+  } catch {
+    // Database connection or table not ready, try API route fallback
   }
+
+  if (typeof window === 'undefined') {
+    try {
+      const host = process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.NEXT_PUBLIC_SITE_URL || 'https://aimimages.vercel.app';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(`${host}/api/admin/settings`, {
+        signal: controller.signal,
+        cache: 'no-store',
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.settingsMap) {
+          return normalizeSettings(data.settingsMap, defaults);
+        }
+      }
+    } catch {
+      // Continue to local store fallback
+    }
+  }
+
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { getStoreSettings } = require('./store');
     return getStoreSettings();
   } catch {
