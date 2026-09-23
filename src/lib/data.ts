@@ -668,9 +668,7 @@ export async function getSiteSettings(): Promise<Record<string, any>> {
 
   if (typeof window === 'undefined') {
     try {
-      const host = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.NEXT_PUBLIC_SITE_URL || 'https://aimimages.vercel.app';
+      const host = process.env.NEXT_PUBLIC_SITE_URL || 'https://aimimages.vercel.app';
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2500);
       const res = await fetch(`${host}/api/admin/settings`, {
