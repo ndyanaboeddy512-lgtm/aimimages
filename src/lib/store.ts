@@ -1,5 +1,48 @@
 import { INITIAL_PROJECTS, SERVICES, TESTIMONIALS, normalizeSettings } from './data';
 
+function getNodeModules() {
+  if (typeof window === 'undefined') {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const fs = require('fs');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const path = require('path');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const os = require('os');
+      return { fs, path, os };
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function persistSettingsToDisk(settings: Record<string, any>) {
+  try {
+    const node = getNodeModules();
+    if (!node) return;
+    const filePath = node.path.join(node.os.tmpdir(), 'aim_store_settings.json');
+    node.fs.writeFileSync(filePath, JSON.stringify(settings), 'utf-8');
+  } catch {
+    // Ignore if disk write fails
+  }
+}
+
+function loadSettingsFromDisk(): Record<string, any> | null {
+  try {
+    const node = getNodeModules();
+    if (!node) return null;
+    const filePath = node.path.join(node.os.tmpdir(), 'aim_store_settings.json');
+    if (node.fs.existsSync(filePath)) {
+      const data = node.fs.readFileSync(filePath, 'utf-8');
+      return JSON.parse(data);
+    }
+  } catch {
+    // Ignore if disk read fails
+  }
+  return null;
+}
+
 export interface StoreMediaItem {
   id: string;
   url: string;
@@ -316,8 +359,10 @@ function getStore(): AimStore {
       createdAt: new Date().toISOString(),
     };
 
+    const diskSettings = loadSettingsFromDisk();
+
     globalThis.__aim_store = {
-      settings: { ...DEFAULT_SETTINGS },
+      settings: { ...DEFAULT_SETTINGS, ...(diskSettings || {}) },
       media: [...INITIAL_MEDIA_ITEMS],
       projects: initialProjects,
       services: initialServices,
@@ -362,6 +407,10 @@ function getStore(): AimStore {
 // -------------------------------------------------------------
 export function getStoreSettings(): Record<string, any> {
   const store = getStore();
+  const diskSettings = loadSettingsFromDisk();
+  if (diskSettings) {
+    store.settings = { ...store.settings, ...diskSettings };
+  }
   return normalizeSettings(store.settings, DEFAULT_SETTINGS);
 }
 
@@ -369,6 +418,7 @@ export function setStoreSetting(key: string, value: any, label?: string, reason?
   const store = getStore();
   const before = store.settings[key];
   store.settings[key] = value;
+  persistSettingsToDisk(store.settings);
 
   // Add revision
   if (!store.settingRevisions[key]) {

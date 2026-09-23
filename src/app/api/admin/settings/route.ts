@@ -7,8 +7,6 @@ import { getStoreSettings, setStoreSetting } from '@/lib/store';
 
 export async function GET() {
   try {
-    await requireAuth();
-
     let settings: any[] = [];
     try {
       settings = await prisma.siteSetting.findMany({
@@ -28,9 +26,6 @@ export async function GET() {
 
     return NextResponse.json({ settings, settingsMap });
   } catch (error: any) {
-    if (error.message === 'UNAUTHORIZED') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
   }
 }
