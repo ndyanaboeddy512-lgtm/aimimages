@@ -122,29 +122,49 @@ export async function processAndStoreFile(
     };
   }
 
-  // Fallback: Local Disk Storage
-  const localUploadsDir = path.join(process.cwd(), 'public', 'uploads');
-  if (!fs.existsSync(localUploadsDir)) {
-    fs.mkdirSync(localUploadsDir, { recursive: true });
+  // Fallback: Local Disk Storage with serverless read-only fallback
+  try {
+    const localUploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    if (!fs.existsSync(localUploadsDir)) {
+      fs.mkdirSync(localUploadsDir, { recursive: true });
+    }
+
+    const localFilePath = path.join(localUploadsDir, filename);
+    fs.writeFileSync(localFilePath, optimizedBuffer);
+
+    return {
+      url: `/uploads/${filename}`,
+      storageKey: uniqueKey,
+      storageBucket: 'local-filesystem',
+      storageProvider: 'LOCAL',
+      filename,
+      originalName,
+      mimeType,
+      sizeBytes: optimizedBuffer.length,
+      width,
+      height,
+      isVideo,
+      posterUrl,
+    };
+  } catch (fsErr) {
+    console.warn('Filesystem write failed (likely serverless/read-only), falling back to data URL:', fsErr);
+    const base64Data = optimizedBuffer.toString('base64');
+    const dataUrl = `data:${mimeType};base64,${base64Data}`;
+    return {
+      url: dataUrl,
+      storageKey: uniqueKey,
+      storageBucket: 'memory-data-url',
+      storageProvider: 'LOCAL',
+      filename,
+      originalName,
+      mimeType,
+      sizeBytes: optimizedBuffer.length,
+      width,
+      height,
+      isVideo,
+      posterUrl,
+    };
   }
-
-  const localFilePath = path.join(localUploadsDir, filename);
-  fs.writeFileSync(localFilePath, optimizedBuffer);
-
-  return {
-    url: `/uploads/${filename}`,
-    storageKey: uniqueKey,
-    storageBucket: 'local-filesystem',
-    storageProvider: 'LOCAL',
-    filename,
-    originalName,
-    mimeType,
-    sizeBytes: optimizedBuffer.length,
-    width,
-    height,
-    isVideo,
-    posterUrl,
-  };
 }
 
 export async function purgeStoredFile(params: {

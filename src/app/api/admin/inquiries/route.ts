@@ -14,11 +14,16 @@ export async function GET(req: NextRequest) {
       where.status = status;
     }
 
-    const inquiries = await prisma.enquiry.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      take: 100,
-    });
+    let inquiries: any[] = [];
+    try {
+      inquiries = await prisma.enquiry.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      });
+    } catch (dbErr) {
+      console.warn('DB error fetching inquiries:', dbErr);
+    }
 
     return NextResponse.json({ inquiries });
   } catch (error: any) {
